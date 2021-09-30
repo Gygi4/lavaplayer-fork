@@ -34,7 +34,7 @@ public class AudioSourceManagers {
   public static void registerRemoteSources(AudioPlayerManager playerManager, MediaContainerRegistry containerRegistry) {
     playerManager.registerSourceManager(new YoutubeAudioSourceManager(true));
     playerManager.registerSourceManager(new YandexMusicAudioSourceManager(true));
-    playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
+    playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault(true));
     playerManager.registerSourceManager(new BandcampAudioSourceManager());
     playerManager.registerSourceManager(new VimeoAudioSourceManager());
     playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());

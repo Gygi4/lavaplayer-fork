@@ -69,12 +69,12 @@ public class SoundCloudAudioSourceManager implements AudioSourceManager, HttpCon
   private final SoundCloudClientIdTracker clientIdTracker;
   private final boolean allowSearch;
 
-  public static SoundCloudAudioSourceManager createDefault() {
+  public static SoundCloudAudioSourceManager createDefault(boolean allowSearch) {
     SoundCloudDataReader dataReader = new DefaultSoundCloudDataReader();
     SoundCloudDataLoader dataLoader = new DefaultSoundCloudDataLoader();
     SoundCloudFormatHandler formatHandler = new DefaultSoundCloudFormatHandler();
 
-    return new SoundCloudAudioSourceManager(true, dataReader, dataLoader, formatHandler,
+    return new SoundCloudAudioSourceManager(allowSearch, dataReader, dataLoader, formatHandler,
         new DefaultSoundCloudPlaylistLoader(dataLoader, dataReader, formatHandler));
   }
 
