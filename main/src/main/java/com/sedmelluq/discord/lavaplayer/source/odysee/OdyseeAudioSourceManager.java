@@ -103,7 +103,7 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
     JsonBrowser jsonTrackInfo = json.get("result").get("lbry://@" + uploader + "/" + videoName);
 
     String claimId = jsonTrackInfo.get("claim_id").safeText();
-    long duration = DataFormatTools.durationTextToMillis(jsonTrackInfo.get("value").get("video").get("duration").safeText()) * 1000;
+    long duration = DataFormatTools.durationTextToMillis(jsonTrackInfo.get("value").get("video").get("duration").safeText());
     String thumbnail = jsonTrackInfo.get("value").get("thumbnail").get("url").safeText();
 
     return new OdyseeAudioTrack(new AudioTrackInfo(
@@ -169,7 +169,7 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
 
           String name = trackInfo.get("name").safeText();
           String author = trackInfo.get("signing_channel").get("name").safeText();
-          long duration = DataFormatTools.durationTextToMillis(trackInfo.get("value").get("video").get("duration").safeText()) * 1000;
+          long duration = DataFormatTools.durationTextToMillis(trackInfo.get("value").get("video").get("duration").safeText());
           String thumbnail = trackInfo.get("value").get("thumbnail").get("url").safeText();
 
           tracks.add(new OdyseeAudioTrack(new AudioTrackInfo(
