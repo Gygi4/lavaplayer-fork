@@ -17,6 +17,8 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -33,6 +35,8 @@ import java.util.regex.Pattern;
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS;
 
 public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigurable {
+  private static final Logger log = LoggerFactory.getLogger(OdyseeAudioSourceManager.class);
+
   private static final String TRACK_URL_REGEX = "^(?:https?://|)odysee\\.com/(.+):.+/(.+):.+";
   private static final String SEARCH_PREFIX = "odsearch:";
 
@@ -79,9 +83,7 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
     try (HttpInterface httpInterface = getHttpInterface()) {
       HttpPost post = new HttpPost(OdyseeConstants.API_URL);
 
-      String body = String.format(OdyseeConstants.RESOLVE_PAYLOAD, "lbry://" + uploader + "/" + videoName);
-
-      post.setEntity(new StringEntity(body, ContentType.APPLICATION_JSON));
+      post.setEntity(new StringEntity(String.format(OdyseeConstants.RESOLVE_PAYLOAD, "lbry://" + uploader + "/" + videoName), ContentType.APPLICATION_JSON));
 
       try (CloseableHttpResponse response = httpInterface.execute(post)) {
         int statusCode = response.getStatusLine().getStatusCode();
@@ -92,20 +94,18 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
 
         JsonBrowser json = JsonBrowser.parse(response.getEntity().getContent());
 
-        return extractTrackFromJson(uploader, videoName, json);
+        return extractTrackFromJson(json.get("result").get("lbry://" + uploader + "/" + videoName));
       }
     } catch (IOException e) {
       throw new FriendlyException("Error occurred when extracting video info.", SUSPICIOUS, e);
     }
   }
 
-  private AudioTrack extractTrackFromJson(String uploader, String videoName, JsonBrowser json) throws IOException {
-    JsonBrowser jsonTrackInfo = json.get("result").get("lbry://" + uploader + "/" + videoName);
+  private AudioTrack extractTrackFromJson(JsonBrowser json) throws IOException {
+    if (!json.get("error").isNull()) throw new IOException("Error response from video info.");
+    if (!json.get("value").get("stream_type").safeText().equals("video")) throw new IOException("Stream type is not video.");
 
-    if (!jsonTrackInfo.get("error").isNull()) throw new IOException("Error response from video info.");
-    if (!jsonTrackInfo.get("value").get("stream_type").safeText().equals("video")) throw new IOException("Stream type is not video.");
-
-    String durationStr = jsonTrackInfo.get("value").get("video").get("duration").text();
+    String durationStr = json.get("value").get("video").get("duration").text();
     long duration;
 
     if (durationStr != null) {
@@ -114,16 +114,18 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
       duration = Units.DURATION_MS_UNKNOWN;
     }
 
-    String claimId = jsonTrackInfo.get("claim_id").safeText();
-    String thumbnail = jsonTrackInfo.get("value").get("thumbnail").get("url").safeText();
+    String name = json.get("name").safeText();
+    String claimId = json.get("claim_id").safeText();
+    String uploader = json.get("signing_channel").get("name").safeText();
+    String thumbnail = json.get("value").get("thumbnail").get("url").safeText();
 
     return new OdyseeAudioTrack(new AudioTrackInfo(
-        videoName,
+        name,
         uploader,
         duration,
-        videoName + "#" + claimId,
+        name + "#" + claimId,
         false,
-        getWatchUrl(uploader, videoName),
+        getWatchUrl(uploader, name),
         thumbnail
     ), this);
   }
@@ -178,30 +180,11 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
         for (String url : urls) {
           JsonBrowser trackInfo = json.get(url);
 
-          if (!trackInfo.get("error").isNull() || !trackInfo.get("value").get("stream_type").safeText().equals("video")) continue;
-
-          String durationStr = trackInfo.get("value").get("video").get("duration").text();
-          long duration;
-
-          if (durationStr != null) {
-            duration = DataFormatTools.durationTextToMillis(durationStr);
-          } else {
-            duration = Units.DURATION_MS_UNKNOWN;
+          try {
+            tracks.add(extractTrackFromJson(trackInfo));
+          } catch (IOException e) {
+            log.debug("Exception when searching for Odysee track, skipping. (Error: {})", e.getMessage());
           }
-
-          String name = trackInfo.get("name").safeText();
-          String author = trackInfo.get("signing_channel").get("name").safeText();
-          String thumbnail = trackInfo.get("value").get("thumbnail").get("url").safeText();
-
-          tracks.add(new OdyseeAudioTrack(new AudioTrackInfo(
-              name,
-              author,
-              duration,
-              url,
-              false,
-              getWatchUrl(author, name),
-              thumbnail
-          ), this));
         }
 
         return tracks;
