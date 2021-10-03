@@ -2,10 +2,7 @@ package com.sedmelluq.discord.lavaplayer.source.odysee;
 
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.tools.DataFormatTools;
-import com.sedmelluq.discord.lavaplayer.tools.ExceptionTools;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.tools.JsonBrowser;
+import com.sedmelluq.discord.lavaplayer.tools.*;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
@@ -108,8 +105,16 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
     if (!jsonTrackInfo.get("error").isNull()) throw new IOException("Error response from video info.");
     if (!jsonTrackInfo.get("value").get("stream_type").text().equals("video")) throw new IOException("Stream type is not video.");
 
+    String durationStr = jsonTrackInfo.get("value").get("video").get("duration").text();
+    long duration;
+
+    if (durationStr != null) {
+      duration = DataFormatTools.durationTextToMillis(durationStr);
+    } else {
+      duration = Units.DURATION_MS_UNKNOWN;
+    }
+
     String claimId = jsonTrackInfo.get("claim_id").safeText();
-    long duration = DataFormatTools.durationTextToMillis(jsonTrackInfo.get("value").get("video").get("duration").safeText());
     String thumbnail = jsonTrackInfo.get("value").get("thumbnail").get("url").safeText();
 
     return new OdyseeAudioTrack(new AudioTrackInfo(
@@ -175,9 +180,17 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
 
           if (!trackInfo.get("error").isNull() || !trackInfo.get("value").get("stream_type").text().equals("video")) continue;
 
+          String durationStr = trackInfo.get("value").get("video").get("duration").text();
+          long duration;
+
+          if (durationStr != null) {
+            duration = DataFormatTools.durationTextToMillis(durationStr);
+          } else {
+            duration = Units.DURATION_MS_UNKNOWN;
+          }
+
           String name = trackInfo.get("name").safeText();
           String author = trackInfo.get("signing_channel").get("name").safeText();
-          long duration = DataFormatTools.durationTextToMillis(trackInfo.get("value").get("video").get("duration").safeText());
           String thumbnail = trackInfo.get("value").get("thumbnail").get("url").safeText();
 
           tracks.add(new OdyseeAudioTrack(new AudioTrackInfo(
