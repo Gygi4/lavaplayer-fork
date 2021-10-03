@@ -102,8 +102,11 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
     }
   }
 
-  private AudioTrack extractTrackFromJson(String uploader, String videoName, JsonBrowser json) {
+  private AudioTrack extractTrackFromJson(String uploader, String videoName, JsonBrowser json) throws IOException {
     JsonBrowser jsonTrackInfo = json.get("result").get("lbry://@" + uploader + "/" + videoName);
+
+    if (!jsonTrackInfo.get("error").isNull()) throw new IOException("Error response from video info.");
+    if (!jsonTrackInfo.get("value").get("stream_type").text().equals("video")) throw new IOException("Stream type is not video.");
 
     String claimId = jsonTrackInfo.get("claim_id").safeText();
     long duration = DataFormatTools.durationTextToMillis(jsonTrackInfo.get("value").get("video").get("duration").safeText());
@@ -170,6 +173,8 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
         for (String url : urls) {
           JsonBrowser trackInfo = json.get(url);
 
+          if (!trackInfo.get("error").isNull() || !trackInfo.get("value").get("stream_type").text().equals("video")) continue;
+
           String name = trackInfo.get("name").safeText();
           String author = trackInfo.get("signing_channel").get("name").safeText();
           long duration = DataFormatTools.durationTextToMillis(trackInfo.get("value").get("video").get("duration").safeText());
@@ -197,7 +202,7 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
     try {
       return new URIBuilder(OdyseeConstants.SEARCH_URL)
           .addParameter("s", query)
-          .addParameter("size", "10")
+          .addParameter("size", "20")
           .build();
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
