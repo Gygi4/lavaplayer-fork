@@ -1,7 +1,7 @@
 package com.sedmelluq.discord.lavaplayer.source.odysee;
 
 import com.sedmelluq.discord.lavaplayer.container.mpeg.MpegAudioTrack;
-import com.sedmelluq.discord.lavaplayer.source.nico.NicoAudioTrack;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.tools.JsonBrowser;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
@@ -20,11 +20,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 
+import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS;
+
 /**
  * Audio track that handles processing Odysee tracks.
  */
 public class OdyseeAudioTrack extends DelegatedAudioTrack {
-  private static final Logger log = LoggerFactory.getLogger(NicoAudioTrack.class);
+  private static final Logger log = LoggerFactory.getLogger(OdyseeAudioTrack.class);
 
   private final OdyseeAudioSourceManager sourceManager;
 
@@ -48,6 +50,8 @@ public class OdyseeAudioTrack extends DelegatedAudioTrack {
       try (PersistentHttpStream stream = new PersistentHttpStream(httpInterface, new URI(playbackUrl), null)) {
         processDelegate(new MpegAudioTrack(trackInfo, stream), executor);
       }
+    } catch (IOException e) {
+      throw new FriendlyException("Loading track from Odysee failed.", SUSPICIOUS, e);
     }
   }
 
@@ -65,9 +69,11 @@ public class OdyseeAudioTrack extends DelegatedAudioTrack {
         throw new IOException("Unexpected status code from playback parameters page: " + statusCode);
       }
 
-      JsonBrowser json = JsonBrowser.parse(response.getEntity().getContent());
+      JsonBrowser playbackUrl = JsonBrowser.parse(response.getEntity().getContent()).get("result").get("streaming_url");
 
-      return json.get("result").get("streaming_url").text();
+      if (playbackUrl.isNull()) throw new IOException("Couldn't get playbackUrl from Odysee track with identifier: " + trackInfo.identifier);
+
+      return playbackUrl.text();
     }
   }
 

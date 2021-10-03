@@ -15,6 +15,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -23,6 +24,8 @@ import org.apache.http.util.EntityUtils;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -120,7 +123,7 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
   private AudioItem loadSearchResult(String query) {
     try (
         HttpInterface httpInterface = getHttpInterface();
-        CloseableHttpResponse response = httpInterface.execute(new HttpPost(String.format(OdyseeConstants.SEARCH_URL, query)))
+        CloseableHttpResponse response = httpInterface.execute(new HttpPost(buildSearchUri(query)))
     ) {
       return loadSearchResultsFromResponse(response, query);
     } catch (IOException e) {
@@ -187,6 +190,17 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
       }
     } catch (IOException e) {
       throw new FriendlyException("Loading track from search result from Odysee failed.", SUSPICIOUS, e);
+    }
+  }
+
+  private URI buildSearchUri(String query) {
+    try {
+      return new URIBuilder(OdyseeConstants.SEARCH_URL)
+          .addParameter("s", query)
+          .addParameter("size", "10")
+          .build();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
   }
 
