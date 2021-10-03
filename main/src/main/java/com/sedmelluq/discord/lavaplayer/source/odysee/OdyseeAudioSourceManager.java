@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS;
 
 public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigurable {
-  private static final String TRACK_URL_REGEX = "^(?:https?://|)odysee\\.com/@(.+)/(.+)";
+  private static final String TRACK_URL_REGEX = "^(?:https?://|)odysee\\.com/(.+):.+/(.+):.+";
   private static final String SEARCH_PREFIX = "odsearch:";
 
   private static final Pattern TRACK_URL_PATTERN = Pattern.compile(TRACK_URL_REGEX);
@@ -79,7 +79,7 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
     try (HttpInterface httpInterface = getHttpInterface()) {
       HttpPost post = new HttpPost(OdyseeConstants.API_URL);
 
-      String body = String.format(OdyseeConstants.RESOLVE_PAYLOAD, uploader + "/" + videoName);
+      String body = String.format(OdyseeConstants.RESOLVE_PAYLOAD, "lbry://" + uploader + "/" + videoName);
 
       post.setEntity(new StringEntity(body, ContentType.APPLICATION_JSON));
 
@@ -100,10 +100,10 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
   }
 
   private AudioTrack extractTrackFromJson(String uploader, String videoName, JsonBrowser json) throws IOException {
-    JsonBrowser jsonTrackInfo = json.get("result").get("lbry://@" + uploader + "/" + videoName);
+    JsonBrowser jsonTrackInfo = json.get("result").get("lbry://" + uploader + "/" + videoName);
 
     if (!jsonTrackInfo.get("error").isNull()) throw new IOException("Error response from video info.");
-    if (!jsonTrackInfo.get("value").get("stream_type").text().equals("video")) throw new IOException("Stream type is not video.");
+    if (!jsonTrackInfo.get("value").get("stream_type").safeText().equals("video")) throw new IOException("Stream type is not video.");
 
     String durationStr = jsonTrackInfo.get("value").get("video").get("duration").text();
     long duration;
@@ -118,8 +118,8 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
     String thumbnail = jsonTrackInfo.get("value").get("thumbnail").get("url").safeText();
 
     return new OdyseeAudioTrack(new AudioTrackInfo(
-        videoName.replaceAll(":[\\d\\w]", ""),
-        uploader.replaceAll(":[\\d\\w]", ""),
+        videoName,
+        uploader,
         duration,
         videoName + "#" + claimId,
         false,
@@ -178,7 +178,7 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
         for (String url : urls) {
           JsonBrowser trackInfo = json.get(url);
 
-          if (!trackInfo.get("error").isNull() || !trackInfo.get("value").get("stream_type").text().equals("video")) continue;
+          if (!trackInfo.get("error").isNull() || !trackInfo.get("value").get("stream_type").safeText().equals("video")) continue;
 
           String durationStr = trackInfo.get("value").get("video").get("duration").text();
           long duration;
