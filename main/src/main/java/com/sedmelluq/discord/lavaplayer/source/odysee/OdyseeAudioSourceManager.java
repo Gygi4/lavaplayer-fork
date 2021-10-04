@@ -106,13 +106,7 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
     if (!json.get("value").get("stream_type").safeText().equals("video")) throw new IOException("Stream type is not video.");
 
     String durationStr = json.get("value").get("video").get("duration").text();
-    long duration;
-
-    if (durationStr != null) {
-      duration = DataFormatTools.durationTextToMillis(durationStr);
-    } else {
-      duration = Units.DURATION_MS_UNKNOWN;
-    }
+    long duration = durationStr == null ? Units.DURATION_MS_UNKNOWN : DataFormatTools.durationTextToMillis(durationStr);
 
     String name = json.get("name").safeText();
     String claimId = json.get("claim_id").safeText();
