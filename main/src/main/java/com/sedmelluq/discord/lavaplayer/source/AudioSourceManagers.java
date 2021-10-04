@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.source.getyarn.GetyarnAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.odysee.OdyseeAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.reddit.RedditAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
@@ -34,13 +35,14 @@ public class AudioSourceManagers {
    */
   public static void registerRemoteSources(AudioPlayerManager playerManager, MediaContainerRegistry containerRegistry) {
     playerManager.registerSourceManager(new YoutubeAudioSourceManager(true));
-    playerManager.registerSourceManager(new YandexMusicAudioSourceManager(true));
-    playerManager.registerSourceManager(new OdyseeAudioSourceManager());
     playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault(true));
     playerManager.registerSourceManager(new BandcampAudioSourceManager());
     playerManager.registerSourceManager(new VimeoAudioSourceManager());
     playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
     playerManager.registerSourceManager(new BeamAudioSourceManager());
+    playerManager.registerSourceManager(new OdyseeAudioSourceManager(true));
+    playerManager.registerSourceManager(new YandexMusicAudioSourceManager(true));
+    playerManager.registerSourceManager(new RedditAudioSourceManager());
     playerManager.registerSourceManager(new GetyarnAudioSourceManager());
     playerManager.registerSourceManager(new HttpAudioSourceManager(containerRegistry));
   }
