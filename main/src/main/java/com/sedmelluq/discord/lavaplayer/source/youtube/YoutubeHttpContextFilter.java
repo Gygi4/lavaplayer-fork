@@ -1,30 +1,27 @@
 package com.sedmelluq.discord.lavaplayer.source.youtube;
 
+import com.sedmelluq.discord.lavaplayer.tools.DataFormatTools;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.tools.http.HttpContextFilter;
+import com.sedmelluq.discord.lavaplayer.tools.http.HttpContextRetryCounter;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
 
-import static com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeConstants.YOUTUBE_ORIGIN;
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.COMMON;
 
 public class YoutubeHttpContextFilter implements HttpContextFilter {
   private static final String ATTRIBUTE_RESET_RETRY = "isResetRetry";
+  private static final HttpContextRetryCounter retryCounter = new HttpContextRetryCounter("yt-token-retry");
 
-  private static String PAPISID = "";
-  private static String PSID = "";
+  private YoutubeAccessTokenTracker tokenTracker;
 
-  public static void setPAPISID(String value) {
-    PAPISID = value;
-  }
-
-  public static void setPSID(String value) {
-    PSID = value;
+  public void setTokenTracker(YoutubeAccessTokenTracker tokenTracker) {
+    this.tokenTracker = tokenTracker;
   }
 
   @Override
@@ -51,13 +48,16 @@ public class YoutubeHttpContextFilter implements HttpContextFilter {
       context.removeAttribute(ATTRIBUTE_RESET_RETRY);
     }
 
-    if (!PAPISID.isEmpty() && !PSID.isEmpty()) {
-      long millis = System.currentTimeMillis();
-      String SAPISIDHASH = DigestUtils.sha1Hex(millis + " " + PAPISID + " " + YOUTUBE_ORIGIN);
+    retryCounter.handleUpdate(context, isRepetition);
 
-      request.setHeader("Cookie", "__Secure-3PAPISID=" + PAPISID + " __Secure-3PSID=" + PSID);
-      request.setHeader("Origin", YOUTUBE_ORIGIN);
-      request.setHeader("Authorization", "SAPISIDHASH " + millis + "_" + SAPISIDHASH);
+    if (tokenTracker.isTokenFetchContext(context)) {
+      // Used for fetching access token, let's not recurse.
+      return;
+    }
+
+    String accessToken = tokenTracker.getAccessToken();
+    if (!DataFormatTools.isNullOrEmpty(accessToken)) {
+      request.setHeader("Authorization", "Bearer " + accessToken);
     }
   }
 
@@ -67,7 +67,14 @@ public class YoutubeHttpContextFilter implements HttpContextFilter {
       throw new FriendlyException("This IP address has been blocked by YouTube (429).", COMMON, null);
     }
 
-    return false;
+    if (tokenTracker.isTokenFetchContext(context) || retryCounter.getRetryCount(context) >= 1) {
+      return false;
+    } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+      tokenTracker.updateAccessToken();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @Override

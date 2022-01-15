@@ -1,6 +1,6 @@
 package com.sedmelluq.discord.lavaplayer.source.youtube;
 
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.ExceptionTools;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -43,6 +43,7 @@ public class YoutubeAudioSourceManager implements AudioSourceManager, HttpConfig
   private final HttpInterfaceManager httpInterfaceManager;
   private final ExtendedHttpConfigurable combinedHttpConfiguration;
   private final YoutubeMixLoader mixLoader;
+  private final YoutubeAccessTokenTracker accessTokenTracker;
   private final boolean allowSearch;
   private final YoutubeTrackDetailsLoader trackDetailsLoader;
   private final YoutubeSearchResultLoader searchResultLoader;
@@ -55,16 +56,20 @@ public class YoutubeAudioSourceManager implements AudioSourceManager, HttpConfig
    * Create an instance with default settings.
    */
   public YoutubeAudioSourceManager() {
-    this(true);
+    this(true, null, null);
   }
 
   /**
    * Create an instance.
    * @param allowSearch Whether to allow search queries as identifiers
+   * @param email Email of Google account to auth in, required for playing age restricted tracks
+   * @param password Password of Google account to auth in, required for playing age restricted tracks
    */
-  public YoutubeAudioSourceManager(boolean allowSearch) {
+  public YoutubeAudioSourceManager(boolean allowSearch, String email, String password) {
     this(
         allowSearch,
+        email,
+        password,
         new DefaultYoutubeTrackDetailsLoader(),
         new YoutubeSearchProvider(),
         new YoutubeSearchMusicProvider(),
@@ -77,6 +82,8 @@ public class YoutubeAudioSourceManager implements AudioSourceManager, HttpConfig
 
   public YoutubeAudioSourceManager(
       boolean allowSearch,
+      String email,
+      String password,
       YoutubeTrackDetailsLoader trackDetailsLoader,
       YoutubeSearchResultLoader searchResultLoader,
       YoutubeSearchMusicResultLoader searchMusicResultLoader,
@@ -86,7 +93,10 @@ public class YoutubeAudioSourceManager implements AudioSourceManager, HttpConfig
       YoutubeMixLoader mixLoader
   ) {
     httpInterfaceManager = HttpClientTools.createDefaultThreadLocalManager();
-    httpInterfaceManager.setHttpContextFilter(new YoutubeHttpContextFilter());
+    accessTokenTracker = new YoutubeAccessTokenTracker(httpInterfaceManager, email, password);
+    YoutubeHttpContextFilter youtubeHttpContextFilter = new YoutubeHttpContextFilter();
+    youtubeHttpContextFilter.setTokenTracker(accessTokenTracker);
+    httpInterfaceManager.setHttpContextFilter(youtubeHttpContextFilter);
 
     this.allowSearch = allowSearch;
     this.trackDetailsLoader = trackDetailsLoader;
@@ -126,7 +136,7 @@ public class YoutubeAudioSourceManager implements AudioSourceManager, HttpConfig
   }
 
   @Override
-  public AudioItem loadItem(DefaultAudioPlayerManager manager, AudioReference reference) {
+  public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference) {
     try {
       return loadItemOnce(reference);
     } catch (FriendlyException exception) {
@@ -157,6 +167,10 @@ public class YoutubeAudioSourceManager implements AudioSourceManager, HttpConfig
   @Override
   public void shutdown() {
     ExceptionTools.closeWithWarnings(httpInterfaceManager);
+  }
+
+  public YoutubeAccessTokenTracker getAccessTokenTracker() {
+    return accessTokenTracker;
   }
 
   /**
