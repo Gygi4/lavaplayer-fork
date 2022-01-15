@@ -1,6 +1,6 @@
 package com.sedmelluq.discord.lavaplayer.source.reddit;
 
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.DataFormatTools;
 import com.sedmelluq.discord.lavaplayer.tools.ExceptionTools;
@@ -52,7 +52,7 @@ public class RedditAudioSourceManager implements AudioSourceManager, HttpConfigu
   }
 
   @Override
-  public AudioItem loadItem(DefaultAudioPlayerManager manager, AudioReference reference) {
+  public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference) {
     Matcher urlMatcher = URL_PATTERN.matcher(reference.identifier);
 
     if (urlMatcher.matches()) {

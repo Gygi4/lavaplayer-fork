@@ -1,6 +1,6 @@
 package com.sedmelluq.discord.lavaplayer.source.odysee;
 
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.*;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
@@ -61,7 +61,7 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
   }
 
   @Override
-  public AudioItem loadItem(DefaultAudioPlayerManager manager, AudioReference reference) {
+  public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference) {
     Matcher trackMatcher = TRACK_URL_PATTERN.matcher(reference.identifier);
 
     if (trackMatcher.matches() && trackMatcher.groupCount() == 2) {
