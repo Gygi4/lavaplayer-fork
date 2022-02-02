@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.tools.JsonBrowser;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
 import com.sedmelluq.discord.lavaplayer.tools.io.PersistentHttpStream;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.DelegatedAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
@@ -61,5 +62,15 @@ public class TiktokAudioTrack extends DelegatedAudioTrack {
     }catch (IOException e) {
       throw new FriendlyException("Failed to get tiktok video playback url.", SUSPICIOUS, e);
     }
+  }
+
+  @Override
+  protected AudioTrack makeShallowClone() {
+    return new TiktokAudioTrack(trackInfo, sourceManager);
+  }
+
+  @Override
+  public TiktokAudioSourceManager getSourceManager() {
+    return sourceManager;
   }
 }

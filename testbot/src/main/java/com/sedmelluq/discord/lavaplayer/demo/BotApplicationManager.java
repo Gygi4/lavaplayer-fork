@@ -14,6 +14,7 @@ import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.odysee.OdyseeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.reddit.RedditAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.tiktok.TiktokAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
@@ -58,6 +59,7 @@ public class BotApplicationManager extends ListenerAdapter {
     playerManager.registerSourceManager(new BeamAudioSourceManager());
     playerManager.registerSourceManager(new OdyseeAudioSourceManager());
     playerManager.registerSourceManager(new RedditAudioSourceManager());
+    playerManager.registerSourceManager(new TiktokAudioSourceManager());
     playerManager.registerSourceManager(new HttpAudioSourceManager());
     playerManager.registerSourceManager(new LocalAudioSourceManager());
 
