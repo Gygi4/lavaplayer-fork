@@ -28,14 +28,22 @@ import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.
 
 public class TiktokAudioSourceManager implements AudioSourceManager, HttpConfigurable {
   private static final String TRACK_URL_REGEX = "^(?:https?://(?:www\\.|m\\.)?|)tiktok\\.com/@\\w+/video/(\\d+)";
+  private static final String MOBILE_URL_REGEX = "^(?:https?://)?vm\\.tiktok\\.com/\\w+";
+
   private static final Pattern TRACK_URL_PATTERN = Pattern.compile(TRACK_URL_REGEX);
+  private static final Pattern MOBILE_URL_PATTERN = Pattern.compile(MOBILE_URL_REGEX);
 
   public static final String API_URL = "https://api2.musical.ly/aweme/v1/aweme/detail/?aweme_id=";
 
   private final HttpInterfaceManager httpInterfaceManager;
 
   public TiktokAudioSourceManager() {
-    this.httpInterfaceManager = HttpClientTools.createDefaultThreadLocalManager();
+    this.httpInterfaceManager = new ThreadLocalHttpInterfaceManager(
+            HttpClientTools
+                    .createSharedCookiesHttpBuilder()
+                    .setRedirectStrategy(new HttpClientTools.NoRedirectsStrategy()),
+            HttpClientTools.DEFAULT_REQUEST_CONFIG
+    );
   }
 
   @Override
@@ -49,6 +57,20 @@ public class TiktokAudioSourceManager implements AudioSourceManager, HttpConfigu
 
     if (match.find()) {
       return extractFromApi(match.group(1));
+    }
+
+    final Matcher mobileMatch = MOBILE_URL_PATTERN.matcher(reference.identifier);
+
+    if (mobileMatch.find()) {
+      String id;
+
+      try {
+        id = getRealId(reference.identifier);
+      } catch (IOException e) {
+        throw new FriendlyException("Failed to get real url of tiktok video.", SUSPICIOUS, e);
+      }
+
+      return extractFromApi(id);
     }
 
     return null;
@@ -121,5 +143,25 @@ public class TiktokAudioSourceManager implements AudioSourceManager, HttpConfigu
     } catch (IOException e) {
       throw new FriendlyException("Failed to fetch tiktok video info.", SUSPICIOUS, e);
     }
+  }
+
+  private String getRealUrl(String url) {
+    try (CloseableHttpResponse response = getHttpInterface().execute(new HttpGet(url))) {
+      return HttpClientTools.getRedirectLocation(url, response);
+    } catch (IOException e) {
+      throw new FriendlyException("Failed to get real url of tiktok video.", SUSPICIOUS, e);
+    }
+  }
+
+  private String getRealId(String reference) throws IOException {
+    final String realUrl = getRealUrl(reference);
+
+    final Matcher match = TRACK_URL_PATTERN.matcher(realUrl);
+
+    if (!match.find()) {
+      throw new IOException("The tiktok video url did not match the regex.");
+    }
+
+    return match.group(1);
   }
 }
