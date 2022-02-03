@@ -45,10 +45,10 @@ public class TiktokAudioSourceManager implements AudioSourceManager, HttpConfigu
 
   @Override
   public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference) {
-    final Matcher m = TRACK_URL_PATTERN.matcher(reference.identifier);
+    final Matcher match = TRACK_URL_PATTERN.matcher(reference.identifier);
 
-    if (m.matches()) {
-      return extractFromApi(m.group(1));
+    if (match.find()) {
+      return extractFromApi(match.group(1));
     }
 
     return null;
