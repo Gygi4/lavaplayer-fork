@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS;
 
 public class TiktokAudioSourceManager implements AudioSourceManager, HttpConfigurable {
-  private static final String TRACK_URL_REGEX = "^(?:https?://(?:www\\.|m\\.)?|)tiktok\\.com/@\\w+/video/(\\d+)";
+  private static final String TRACK_URL_REGEX = "^(?:https?://(?:www\\.|m\\.)?|)tiktok\\.com/@[^/]+/video/(\\d+)";
   private static final String MOBILE_URL_REGEX = "^(?:https?://)?vm\\.tiktok\\.com/\\w+";
 
   private static final Pattern TRACK_URL_PATTERN = Pattern.compile(TRACK_URL_REGEX);
