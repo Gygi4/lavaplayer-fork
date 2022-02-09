@@ -24,6 +24,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.COMMON;
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS;
 
 public class TiktokAudioSourceManager implements AudioSourceManager, HttpConfigurable {
@@ -67,7 +68,7 @@ public class TiktokAudioSourceManager implements AudioSourceManager, HttpConfigu
       try {
         id = getRealId(reference.identifier);
       } catch (IOException e) {
-        throw new FriendlyException("Failed to get real url of tiktok video.", SUSPICIOUS, e);
+        throw new FriendlyException("Tiktok url is not a valid video.", COMMON, e);
       }
 
       return extractFromApi(id);
