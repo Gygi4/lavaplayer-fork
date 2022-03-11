@@ -6,7 +6,6 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeTrackJsonData;
 import com.sedmelluq.discord.lavaplayer.tools.DataFormatTools;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,7 +79,9 @@ public class LegacyDashMpdFormatsExtractor implements YoutubeTrackFormatExtracto
             ContentType.parse(contentType),
             Long.parseLong(representation.attr("bandwidth")),
             Long.parseLong(contentLength),
+            2,
             url,
+            "",
             null,
             DEFAULT_SIGNATURE_KEY
         ));
