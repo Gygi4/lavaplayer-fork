@@ -9,6 +9,7 @@ import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.odysee.OdyseeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.reddit.RedditAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.rumble.RumbleAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.tiktok.TiktokAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
@@ -46,6 +47,7 @@ public class AudioSourceManagers {
     playerManager.registerSourceManager(new YandexMusicAudioSourceManager(true));
     playerManager.registerSourceManager(new RedditAudioSourceManager());
     playerManager.registerSourceManager(new GetyarnAudioSourceManager());
+    playerManager.registerSourceManager(new RumbleAudioSourceManager());
     playerManager.registerSourceManager(new HttpAudioSourceManager(containerRegistry));
   }
 
