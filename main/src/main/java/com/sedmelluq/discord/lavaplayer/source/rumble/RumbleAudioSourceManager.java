@@ -103,7 +103,7 @@ public class RumbleAudioSourceManager implements AudioSourceManager, HttpConfigu
 
         return new RumbleAudioTrack(new AudioTrackInfo(
                 info.get("name").safeText(),
-                authorMatcher.group(1),
+                authorMatcher.group(1).trim(),
                 parseDuration(info.get("duration").safeText()),
                 idMatcher.group("id"),
                 false,
