@@ -18,10 +18,10 @@ public class PBJUtils {
             if (lastThumbnail.contains("maxresdefault")) {
                 return lastThumbnail;
             } else {
-                return String.format("https://i.ytimg.com/vi/%s/mqdefault.jpg", videoId);
+                return String.format("https://i.ytimg.com/vi/%s/hqdefault.jpg", videoId);
             }
         }
-        return String.format("https://i.ytimg.com/vi/%s/mqdefault.jpg", videoId);
+        return String.format("https://i.ytimg.com/vi/%s/hqdefault.jpg", videoId);
     }
 
     public static String getSoundCloudThumbnail(JsonBrowser trackData) {
