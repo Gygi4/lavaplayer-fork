@@ -60,6 +60,8 @@ public class RumbleAudioTrack extends DelegatedAudioTrack {
 
       JsonBrowser json = JsonBrowser.parse(response.getEntity().getContent());
 
+      if (json.get("ua").get("mp4").isNull()) throw new IOException("Could not find a playable mp4 url");
+
       return json.get("ua").get("mp4").get("360").get("url").text();
     }
   }

@@ -34,8 +34,8 @@ public class RedditAudioSourceManager implements AudioSourceManager, HttpConfigu
   private static final String URL_REGEX = "^https?://(?:old\\.|www\\.)?reddit.com/r/\\w+/\\w+/(.+)/.+";
   private static final String VIDEO_URL_REGEX = "^https?://v\\.redd\\.it/(.+)/.+";
 
-  private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
-  private static final Pattern VIDEO_URL_PATTERN = Pattern.compile(VIDEO_URL_REGEX);
+  private static final Pattern urlPattern = Pattern.compile(URL_REGEX);
+  private static final Pattern videoUrlPattern = Pattern.compile(VIDEO_URL_REGEX);
 
   private static final String API_URL = "https://api.reddit.com/api/info/?id=t3_";
 
@@ -53,7 +53,7 @@ public class RedditAudioSourceManager implements AudioSourceManager, HttpConfigu
 
   @Override
   public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference) {
-    Matcher urlMatcher = URL_PATTERN.matcher(reference.identifier);
+    Matcher urlMatcher = urlPattern.matcher(reference.identifier);
 
     if (urlMatcher.matches()) {
       return loadTrack(urlMatcher.group(1));
@@ -87,17 +87,29 @@ public class RedditAudioSourceManager implements AudioSourceManager, HttpConfigu
   private AudioTrack extractTrackFromJson(JsonBrowser json) throws IOException {
     JsonBrowser data = json.get("data").get("children").index(0).get("data");
 
-    if (!data.get("post_hint").text().equals("hosted:video")) throw new IOException("Reddit post does not contain a video.");
-
-    String title = data.get("title").safeText();
-    String author = data.get("author").safeText();
+    final String title = data.get("title").safeText();
+    final String author = data.get("author").safeText();
     String thumbnailUrl = data.get("thumbnail").safeText();
+
+    switch (thumbnailUrl) {
+      case "default":
+        thumbnailUrl = "https://www.reddit.com/static/noimage.png";
+        break;
+      case "self":
+        thumbnailUrl = "https://www.reddit.com/static/self_default2.png";
+        break;
+      case "nsfw":
+        thumbnailUrl = "https://www.reddit.com/static/nsfw2.png";
+        break;
+    }
+
+    if (data.get("secure_media").isNull()) throw new IOException("Reddit post does not contain a video.");
 
     JsonBrowser videoData = data.get("secure_media").get("reddit_video");
 
     String url = videoData.get("fallback_url").text();
 
-    Matcher matcher = VIDEO_URL_PATTERN.matcher(url);
+    final Matcher matcher = videoUrlPattern.matcher(url);
 
     if (!matcher.matches())
       throw new IOException("Couldn't get playback url.");
