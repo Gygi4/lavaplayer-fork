@@ -7,7 +7,7 @@ version = "1.2.50"
 
 dependencies {
   implementation(project(":main"))
-  implementation("org.springframework.boot:spring-boot-starter-web:2.7.0")
+  implementation("org.springframework.boot:spring-boot-starter-web:2.7.1")
 }
 
 tasks.bootJar {

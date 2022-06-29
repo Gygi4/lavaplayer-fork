@@ -23,7 +23,7 @@ dependencies {
   implementation("org.jsoup:jsoup:1.15.1")
   implementation("net.iharder:base64:2.3.9")
 
-  testImplementation("org.codehaus.groovy:groovy:3.0.10")
+  testImplementation("org.codehaus.groovy:groovy:3.0.11")
   testImplementation("org.spockframework:spock-core:2.1-groovy-3.0")
   testImplementation("ch.qos.logback:logback-classic:1.2.11")
   testImplementation("com.sedmelluq:lavaplayer-test-samples:1.3.11")
