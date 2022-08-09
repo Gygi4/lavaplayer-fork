@@ -139,7 +139,8 @@ public class TiktokAudioSourceManager implements AudioSourceManager, HttpConfigu
           id,
           false,
           uri,
-          thumbnailUrl
+          thumbnailUrl,
+          null
       ), this);
     } catch (IOException e) {
       throw new FriendlyException("Failed to fetch tiktok video info.", SUSPICIOUS, e);

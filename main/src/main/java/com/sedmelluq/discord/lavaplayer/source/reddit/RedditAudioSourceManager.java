@@ -124,7 +124,8 @@ public class RedditAudioSourceManager implements AudioSourceManager, HttpConfigu
         id,
         false,
         url,
-        thumbnailUrl
+        thumbnailUrl,
+        null
     ), this);
   }
 

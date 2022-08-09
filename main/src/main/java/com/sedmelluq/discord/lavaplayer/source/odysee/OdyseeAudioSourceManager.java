@@ -120,7 +120,8 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
         name + "#" + claimId,
         false,
         getWatchUrl(uploader, name),
-        thumbnail
+        thumbnail,
+        null
     ), this);
   }
 

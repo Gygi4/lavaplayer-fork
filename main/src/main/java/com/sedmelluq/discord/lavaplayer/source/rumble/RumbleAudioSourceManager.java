@@ -108,7 +108,8 @@ public class RumbleAudioSourceManager implements AudioSourceManager, HttpConfigu
                 idMatcher.group("id"),
                 false,
                 info.get("url").safeText(),
-                info.get("thumbnailUrl").safeText()
+                info.get("thumbnailUrl").safeText(),
+                null
         ), this);
       }
     } catch (Exception e) {
