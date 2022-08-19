@@ -16,6 +16,8 @@ dependencies {
 
   api("org.apache.httpcomponents:httpclient:4.5.13")
   implementation("commons-io:commons-io:2.11.0")
+  
+  implementation("commons-codec:commons-codec:1.15")
 
   api("com.fasterxml.jackson.core:jackson-core:2.13.3")
   api("com.fasterxml.jackson.core:jackson-databind:2.13.3")
