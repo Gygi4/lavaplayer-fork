@@ -15,18 +15,18 @@ dependencies {
   implementation("org.slf4j:slf4j-api:1.7.36")
 
   api("org.apache.httpcomponents:httpclient:4.5.13")
-  implementation("commons-io:commons-io:2.11.0")
-  
   implementation("commons-codec:commons-codec:1.15")
+  implementation("commons-io:commons-io:2.11.0")
 
-  api("com.fasterxml.jackson.core:jackson-core:2.13.3")
-  api("com.fasterxml.jackson.core:jackson-databind:2.13.3")
+  api("com.fasterxml.jackson.core:jackson-core:2.13.4")
+  api("com.fasterxml.jackson.core:jackson-databind:2.13.4.2")
 
-  implementation("org.jsoup:jsoup:1.15.2")
+  implementation("org.jsoup:jsoup:1.15.3")
   implementation("net.iharder:base64:2.3.9")
+  implementation("org.json:json:20220924")
 
-  testImplementation("org.codehaus.groovy:groovy:3.0.12")
-  testImplementation("org.spockframework:spock-core:2.1-groovy-3.0")
+  testImplementation("org.codehaus.groovy:groovy:3.0.13")
+  testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
   testImplementation("ch.qos.logback:logback-classic:1.2.11")
   testImplementation("com.sedmelluq:lavaplayer-test-samples:1.3.11")
 }

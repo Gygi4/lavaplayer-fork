@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeConstants.MUSIC_SEARCH_URL;
-import static com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeConstants.MUSIC_SEARCH_PAYLOAD;
+import static com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeConstants.SEARCH_MUSIC_PARAMS;
 import static com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeConstants.WATCH_URL_PREFIX;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -48,12 +48,15 @@ public class YoutubeSearchMusicProvider implements YoutubeSearchMusicResultLoade
    */
   @Override
   public AudioItem loadSearchMusicResult(String query, Function<AudioTrackInfo, AudioTrack> trackFactory) {
-    String escapedQuery = query.replaceAll("\"|\\\\", "");
-    log.debug("Performing a search music with query {}", escapedQuery);
+    log.debug("Performing a search music with query {}", query);
 
     try (HttpInterface httpInterface = httpInterfaceManager.getInterface()) {
       HttpPost post = new HttpPost(MUSIC_SEARCH_URL);
-      StringEntity payload = new StringEntity(String.format(MUSIC_SEARCH_PAYLOAD, escapedQuery), "UTF-8");
+      YoutubeClientConfig clientConfig = YoutubeClientConfig.MUSIC.copy()
+              .withRootField("query", query)
+              .withRootField("params", SEARCH_MUSIC_PARAMS)
+              .setAttribute(httpInterface);
+      StringEntity payload = new StringEntity(clientConfig.toJsonString(), "UTF-8");
       post.setHeader("Referer", "music.youtube.com");
       post.setEntity(payload);
 
@@ -90,28 +93,28 @@ public class YoutubeSearchMusicProvider implements YoutubeSearchMusicResultLoade
   private List<AudioTrack> extractMusicSearchPage(JsonBrowser jsonBrowser, Function<AudioTrackInfo, AudioTrack> trackFactory) throws IOException {
     ArrayList<AudioTrack> list = new ArrayList<>();
     JsonBrowser tracks = jsonBrowser.get("contents")
-        .get("tabbedSearchResultsRenderer")
-        .get("tabs")
-        .index(0)
-        .get("tabRenderer")
-        .get("content")
-        .get("sectionListRenderer")
-        .get("contents")
-        .index(0)
-        .get("musicShelfRenderer")
-        .get("contents");
+            .get("tabbedSearchResultsRenderer")
+            .get("tabs")
+            .index(0)
+            .get("tabRenderer")
+            .get("content")
+            .get("sectionListRenderer")
+            .get("contents")
+            .index(0)
+            .get("musicShelfRenderer")
+            .get("contents");
     if (tracks == JsonBrowser.NULL_BROWSER) {
       tracks = jsonBrowser.get("contents")
-          .get("tabbedSearchResultsRenderer")
-          .get("tabs")
-          .index(0)
-          .get("tabRenderer")
-          .get("content")
-          .get("sectionListRenderer")
-          .get("contents")
-          .index(1)
-          .get("musicShelfRenderer")
-          .get("contents");
+              .get("tabbedSearchResultsRenderer")
+              .get("tabs")
+              .index(0)
+              .get("tabRenderer")
+              .get("content")
+              .get("sectionListRenderer")
+              .get("contents")
+              .index(1)
+              .get("musicShelfRenderer")
+              .get("contents");
     }
     tracks.values().forEach(jsonTrack -> {
       AudioTrack track = extractMusicTrack(jsonTrack, trackFactory);
@@ -128,24 +131,24 @@ public class YoutubeSearchMusicProvider implements YoutubeSearchMusicResultLoade
       return null;
     }
     JsonBrowser firstColumn = columns.index(0)
-        .get("musicResponsiveListItemFlexColumnRenderer")
-        .get("text")
-        .get("runs")
-        .index(0);
+            .get("musicResponsiveListItemFlexColumnRenderer")
+            .get("text")
+            .get("runs")
+            .index(0);
     String title = firstColumn.get("text").text();
     String videoId = firstColumn.get("navigationEndpoint")
-        .get("watchEndpoint")
-        .get("videoId").text();
+            .get("watchEndpoint")
+            .get("videoId").text();
     if (videoId == null) {
       // If track is not available on YouTube Music videoId will be empty
       return null;
     }
     List<JsonBrowser> secondColumn = columns.index(1)
-        .get("musicResponsiveListItemFlexColumnRenderer")
-        .get("text")
-        .get("runs").values();
+            .get("musicResponsiveListItemFlexColumnRenderer")
+            .get("text")
+            .get("runs").values();
     String author = secondColumn.get(0)
-        .get("text").text();
+            .get("text").text();
     JsonBrowser lastElement = secondColumn.get(secondColumn.size() - 1);
 
     if (!lastElement.get("navigationEndpoint").isNull()) {

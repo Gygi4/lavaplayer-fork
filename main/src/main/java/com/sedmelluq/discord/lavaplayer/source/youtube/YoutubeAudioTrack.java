@@ -20,7 +20,7 @@ import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.
 import static com.sedmelluq.discord.lavaplayer.tools.Units.CONTENT_LENGTH_UNKNOWN;
 
 /**
- * Audio track that handles processing Youtube videos as audio tracks.
+ * Audio track that handles processing YouTube videos as audio tracks.
  */
 public class YoutubeAudioTrack extends DelegatedAudioTrack {
   private static final Logger log = LoggerFactory.getLogger(YoutubeAudioTrack.class);
