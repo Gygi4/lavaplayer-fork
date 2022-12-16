@@ -12,7 +12,7 @@ dependencies {
   implementation("com.github.davidffa:lavaplayer-natives-fork:1.0.2")
   implementation("com.github.walkyst.JAADec-fork:jaadec-ext-aac:0.1.3")
   implementation("org.mozilla:rhino-engine:1.7.14")
-  implementation("org.slf4j:slf4j-api:2.0.6")
+  implementation("org.slf4j:slf4j-api:1.7.36")
 
   api("org.apache.httpcomponents:httpclient:4.5.13")
   implementation("commons-codec:commons-codec:1.15")
@@ -27,7 +27,7 @@ dependencies {
 
   testImplementation("org.codehaus.groovy:groovy:3.0.13")
   testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
-  testImplementation("ch.qos.logback:logback-classic:1.4.5")
+  testImplementation("ch.qos.logback:logback-classic:1.2.11")
   testImplementation("com.sedmelluq:lavaplayer-test-samples:1.3.11")
 }
 
