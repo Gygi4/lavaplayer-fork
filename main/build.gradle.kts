@@ -5,11 +5,11 @@ plugins {
 }
 
 val moduleName = "lavaplayer"
-version = "1.3.98.2"
+version = "1.3.99.2"
 
 dependencies {
   api("com.github.davidffa.lavaplayer-fork:lava-common:ebd213f")
-  implementation("com.github.davidffa:lavaplayer-natives-fork:523a9ef")
+  implementation("com.github.davidffa:lavaplayer-natives-fork:1.0.3")
   implementation("com.github.walkyst.JAADec-fork:jaadec-ext-aac:0.1.3")
   implementation("org.mozilla:rhino-engine:1.7.14")
   implementation("org.slf4j:slf4j-api:1.7.36")
@@ -18,8 +18,8 @@ dependencies {
   implementation("commons-codec:commons-codec:1.15")
   implementation("commons-io:commons-io:2.11.0")
 
-  api("com.fasterxml.jackson.core:jackson-core:2.14.1")
-  api("com.fasterxml.jackson.core:jackson-databind:2.14.1")
+  api("com.fasterxml.jackson.core:jackson-core:2.14.2")
+  api("com.fasterxml.jackson.core:jackson-databind:2.14.2")
 
   implementation("org.jsoup:jsoup:1.15.3")
   implementation("net.iharder:base64:2.3.9")
