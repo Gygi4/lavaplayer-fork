@@ -3,7 +3,6 @@ package com.sedmelluq.discord.lavaplayer.tools.http;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.tools.io.TrustManagerBuilder;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
@@ -48,8 +47,9 @@ public class ExtendedHttpClientBuilder extends HttpClientBuilder {
 
   private SSLContext sslContextOverride;
   private String[] sslSupportedProtocols;
+  private PlainConnectionSocketFactory plainSocketFactory;
+  private SSLConnectionSocketFactory sslSocketFactory;
   private ConnectionManagerFactory connectionManagerFactory = ExtendedHttpClientBuilder::createDefaultConnectionManager;
-
   @Override
   public synchronized CloseableHttpClient build() {
     setConnectionManager(createConnectionManager());
@@ -71,6 +71,14 @@ public class ExtendedHttpClientBuilder extends HttpClientBuilder {
     this.sslSupportedProtocols = protocols;
   }
 
+  public void setPlainConnectionSocketFactory(PlainConnectionSocketFactory plainSocketFactory) {
+    this.plainSocketFactory = plainSocketFactory;
+  }
+
+  public void setSslConnectionSocketFactory(SSLConnectionSocketFactory sslSocketFactory) {
+    this.sslSocketFactory = sslSocketFactory;
+  }
+
   public void setConnectionManagerFactory(ConnectionManagerFactory factory) {
     this.connectionManagerFactory = factory;
   }
@@ -89,12 +97,12 @@ public class ExtendedHttpClientBuilder extends HttpClientBuilder {
 
   private Registry<ConnectionSocketFactory> createConnectionSocketFactory() {
     HostnameVerifier hostnameVerifier = new DefaultHostnameVerifier(PublicSuffixMatcherLoader.getDefault());
-    ConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContextOverride != null ?
+    ConnectionSocketFactory defaultSslSocketFactory = new SSLConnectionSocketFactory(sslContextOverride != null ?
         sslContextOverride : defaultSslContext, sslSupportedProtocols, null, hostnameVerifier);
 
     return RegistryBuilder.<ConnectionSocketFactory>create()
-        .register("http", PlainConnectionSocketFactory.getSocketFactory())
-        .register("https", sslSocketFactory)
+        .register("http", plainSocketFactory != null ? plainSocketFactory : PlainConnectionSocketFactory.getSocketFactory())
+        .register("https", sslSocketFactory != null ? sslSocketFactory : defaultSslSocketFactory)
         .build();
   }
 

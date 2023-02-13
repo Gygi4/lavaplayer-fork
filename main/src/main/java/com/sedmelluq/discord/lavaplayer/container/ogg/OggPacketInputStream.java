@@ -8,6 +8,8 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.sedmelluq.discord.lavaplayer.container.MediaContainerDetection.checkNextBytes;
 
@@ -27,6 +29,7 @@ public class OggPacketInputStream extends InputStream {
   private final DataInput dataInput;
   private final int[] segmentSizes;
 
+  private List<OggSeekPoint> seekPoints;
   private OggPageHeader pageHeader;
   private int bytesLeftInPacket;
   private boolean packetContinues;
@@ -43,6 +46,10 @@ public class OggPacketInputStream extends InputStream {
     this.dataInput = new DataInputStream(inputStream);
     this.segmentSizes = new int[256];
     this.state = State.TRACK_BOUNDARY;
+  }
+
+  public void setSeekPoints(List<OggSeekPoint> seekPoints) {
+    this.seekPoints = seekPoints;
   }
 
   /**
@@ -70,6 +77,8 @@ public class OggPacketInputStream extends InputStream {
   public boolean startNewPacket() throws IOException {
     if (state == State.TRACK_BOUNDARY) {
       return false;
+    } else if (state == State.TRACK_SEEKING) {
+      loadNextNonEmptyPage();
     } else if (state != State.PACKET_BOUNDARY) {
       throw new IllegalStateException("Cannot start a new packet while the previous one has not been consumed.");
     }
@@ -244,7 +253,7 @@ public class OggPacketInputStream extends InputStream {
 
       if (bytesLeftInPacket == 0) {
         // We got everything from our chunk of size min(leftInPacket, requested) and also exhausted the bytes that we
-        // know the packet had left. Check if the packet continues so we could continue fetching from the same packet.
+        // know the packet had left. Check if the packet continues, so we could continue fetching from the same packet.
         // Otherwise, bugger out.
 
         if (!continuePacket()) {
@@ -273,6 +282,62 @@ public class OggPacketInputStream extends InputStream {
     if (closeDelegated) {
       inputStream.close();
     }
+  }
+
+  /**
+   * Seeks the stream to the specified timecode.
+   * @param timecode Timecode in milliseconds to seek to.
+   * @return The actual timecode in milliseconds to which the stream was seeked.
+   * @throws IOException On read error.
+   */
+  public long seek(long timecode) throws IOException {
+    if (seekPoints == null) {
+      throw new IllegalStateException("Seek points have not been set.");
+    }
+
+    // Binary search for the seek point with the largest timecode that is smaller than or equal to the target timecode
+    int low = 0;
+    int mid = 0;
+    int high = seekPoints.size() - 1;
+    while (low <= high) {
+      mid = (low + high) / 2;
+      if (seekPoints.get(mid).getTimecode() <= timecode) {
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+
+    if (mid > 0) {
+      mid--;
+    } else {
+      mid++;
+    }
+
+    OggSeekPoint seekPoint = seekPoints.get(mid);
+    inputStream.seek(seekPoint.getPosition());
+    state = State.TRACK_SEEKING;
+
+    return seekPoint.getTimecode();
+  }
+
+  public List<OggSeekPoint> createSeekTable(int sampleRate) throws IOException {
+    if (!inputStream.canSeekHard()) {
+      return null;
+    }
+
+    long savedPosition = inputStream.getPosition();
+
+    long absoluteOffset = pageHeader.byteStreamPosition;
+    inputStream.seek(absoluteOffset);
+
+    byte[] data = new byte[(int) inputStream.getContentLength()];
+    int dataLength = StreamTools.readUntilEnd(inputStream, data, 0, data.length);
+
+    List<OggSeekPoint> seekPoints = new OggPageScanner(absoluteOffset, data, dataLength).createSeekTable(sampleRate);
+
+    inputStream.seek(savedPosition);
+    return seekPoints;
   }
 
   /**
@@ -311,8 +376,8 @@ public class OggPacketInputStream extends InputStream {
     byte[] data = new byte[tailLength];
     int dataLength = StreamTools.readUntilEnd(inputStream, data, 0, data.length);
 
-    return new OggPageScanner(absoluteOffset, data, dataLength).scanForSizeInfo(pageHeader.byteStreamPosition,
-        sampleRate);
+    return new OggPageScanner(absoluteOffset, data, dataLength)
+        .scanForSizeInfo(pageHeader.byteStreamPosition, sampleRate);
   }
 
   /**
@@ -340,6 +405,7 @@ public class OggPacketInputStream extends InputStream {
   }
 
   private enum State {
+    TRACK_SEEKING,
     TRACK_BOUNDARY,
     PACKET_BOUNDARY,
     PACKET_READ,
