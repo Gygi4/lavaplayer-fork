@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -76,6 +76,20 @@ public enum DefaultOperatingSystemTypes implements OperatingSystemType {
               if (line.contains("-musl-")) {
                 check = true;
                 break;
+              }
+            }
+          }
+
+          if (!check) {
+            File directory = new File("/lib");
+            File[] allSubFiles = directory.listFiles();
+
+            if (allSubFiles != null) {
+              for (File file : allSubFiles) {
+                if (file.isFile() && file.getName().contains("-musl-")) {
+                  check = true;
+                  break;
+                }
               }
             }
           }
