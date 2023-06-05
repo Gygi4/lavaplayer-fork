@@ -84,7 +84,7 @@ public enum DefaultOperatingSystemTypes implements OperatingSystemType {
           check = false;
         }
 
-        log.debug("is musl: {}", check);
+        log.info("is musl: {}", check);
         b = cachedMusl = check;
       }
     }
