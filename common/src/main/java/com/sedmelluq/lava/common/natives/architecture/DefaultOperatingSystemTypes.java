@@ -80,7 +80,7 @@ public enum DefaultOperatingSystemTypes implements OperatingSystemType {
             }
           }
 
-          if (!check) {
+          /* if (!check) {
             File directory = new File("/lib");
             File[] allSubFiles = directory.listFiles();
 
@@ -92,13 +92,13 @@ public enum DefaultOperatingSystemTypes implements OperatingSystemType {
                 }
               }
             }
-          }
+          } */
         } catch (IOException fail) {
           log.error("Failed to detect libc type, assuming glibc", fail);
           check = false;
         }
 
-        log.info("is musl: {}", check);
+        log.debug("is musl: {}", check);
         b = cachedMusl = check;
       }
     }
