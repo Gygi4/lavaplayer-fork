@@ -53,7 +53,7 @@ public class YoutubeAccessTokenTracker {
   private static final Logger log = LoggerFactory.getLogger(YoutubeAccessTokenTracker.class);
 
   private static final String AUTH_SCRIPT_REGEX = "<script id=\"base-js\" src=\"(.*?)\" nonce=\".*?\"></script>";
-  private static final String IDENTITY_REGEX = "\\{clientId:\"(.+?)\",.+?:\"(.+?)\"}";
+  private static final String IDENTITY_REGEX = "\\{clientId:\"(.+?)\",.+?:\"(.+?)\"";
 
   private static final Pattern authScriptPattern = Pattern.compile(AUTH_SCRIPT_REGEX);
   private static final Pattern identityPattern = Pattern.compile(IDENTITY_REGEX);
@@ -108,7 +108,7 @@ public class YoutubeAccessTokenTracker {
       lastMasterTokenUpdate = now;
       log.info("Updating YouTube master token (current is {}).", masterToken);
 
-      // Don't block main thread since if first auth method failed then we go to second and it's require waiting when user is complete auth.
+      // Don't block main thread since if first auth method failed then we go to second, and it's require waiting when user is complete auth.
       CompletableFuture.runAsync(() -> {
         try {
           Thread.sleep(100L);
