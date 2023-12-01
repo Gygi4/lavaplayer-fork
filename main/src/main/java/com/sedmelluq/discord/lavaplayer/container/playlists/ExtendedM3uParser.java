@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Parser for extended M3U lines, handles the format where directives have named argumentsm, for example:
+ * Parser for extended M3U lines, handles the format where directives have named arguments, for example:
  * #SOMETHING:FOO="thing",BAR=4
  */
 public class ExtendedM3uParser {
@@ -50,7 +50,7 @@ public class ExtendedM3uParser {
   }
 
   /**
-   * Parsed extended M3U line info. May be either an empty line (isDirective() and isData() both false), a directive
+   * Parsed extended M3U line info. Maybe either an empty line (isDirective() and isData() both false), a directive
    * or a data line.
    */
   public static class Line {
