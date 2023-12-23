@@ -31,7 +31,7 @@ public class PersistentHttpStream extends SeekableInputStream implements AutoClo
 
   private static final long MAX_SKIP_DISTANCE = 512L * 1024L;
 
-  private final HttpInterface httpInterface;
+  protected final HttpInterface httpInterface;
   protected final URI contentUrl;
   private int lastStatusCode;
   private CloseableHttpResponse currentResponse;
@@ -109,7 +109,7 @@ public class PersistentHttpStream extends SeekableInputStream implements AutoClo
       }
     }
   }
-  
+
    /**
     * @return An InputStream implementation for the current http stream.
     */
