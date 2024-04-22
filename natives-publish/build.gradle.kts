@@ -6,6 +6,11 @@ plugins {
     alias(libs.plugins.maven.publish.base)
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 base {
     archivesName = "lavaplayer-natives"
 }
