@@ -2,12 +2,8 @@ import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 
 plugins {
-    `java-library`
+    java
     alias(libs.plugins.maven.publish.base)
-}
-
-java {
-    withSourcesJar()
 }
 
 base {

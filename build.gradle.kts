@@ -35,6 +35,68 @@ subprojects {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    configure<PublishingExtension> {
+        if (findProperty("MAVEN_PASSWORD") != null && findProperty("MAVEN_USERNAME") != null) {
+            repositories {
+                val snapshots = "https://maven.lavalink.dev/snapshots"
+                val releases = "https://maven.lavalink.dev/releases"
+
+                maven(if (release) releases else snapshots) {
+                    credentials {
+                        password = findProperty("MAVEN_PASSWORD") as String?
+                        username = findProperty("MAVEN_USERNAME") as String?
+                    }
+                }
+            }
+        } else {
+            logger.lifecycle("Not publishing to maven.lavalink.dev because credentials are not set")
+        }
+    }
+
+    afterEvaluate {
+        plugins.withId(libs.plugins.maven.publish.base.get().pluginId) {
+            configure<MavenPublishBaseExtension> {
+                coordinates(group.toString(), project.the<BasePluginExtension>().archivesName.get(), version.toString())
+
+                if (findProperty("mavenCentralUsername") != null && findProperty("mavenCentralPassword") != null) {
+                    publishToMavenCentral(SonatypeHost.S01, false)
+                    if (release) {
+                        signAllPublications()
+                    }
+                } else {
+                    logger.lifecycle("Not publishing to OSSRH due to missing credentials")
+                }
+
+                pom {
+                    name = "lavaplayer"
+                    description = "A Lavaplayer fork maintained by Lavalink"
+                    url = "https://github.com/lavalink-devs/lavaplayer"
+
+                    licenses {
+                        license {
+                            name = "The Apache License, Version 2.0"
+                            url = "https://github.com/lavalink-devs/lavaplayer/blob/main/LICENSE"
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = "freyacodes"
+                            name = "Freya Arbjerg"
+                            url = "https://www.arbjerg.dev"
+                        }
+                    }
+
+                    scm {
+                        url = "https://github.com/lavalink-devs/lavaplayer/"
+                        connection = "scm:git:git://github.com/lavalink-devs/lavaplayer.git"
+                        developerConnection = "scm:git:ssh://git@github.com/lavalink-devs/lavaplayer.git"
+                    }
+                }
+            }
+        }
+    }
 }
 
 @SuppressWarnings("GrMethodMayBeStatic")
