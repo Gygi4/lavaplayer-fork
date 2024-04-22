@@ -1,27 +1,20 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+
 plugins {
-  `java-library`
-  `maven-publish`
+    `java-library`
+    alias(libs.plugins.maven.publish.base)
 }
 
-val moduleName = "lavaplayer-ext-youtube-rotator"
-version = "0.2.3"
+base {
+    archivesName = "lavaplayer-ext-youtube-rotator"
+}
 
 dependencies {
-  compileOnly(project(":main"))
-  implementation("org.slf4j:slf4j-api:1.7.36")
+    compileOnly(projects.main)
+    implementation(libs.slf4j)
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
-  archiveClassifier.set("sources")
-  from(sourceSets["main"].allSource)
-}
-
-publishing {
-  publications {
-    create<MavenPublication>("mavenJava") {
-      from(components["java"])
-      artifactId = moduleName
-      artifact(sourcesJar)
-    }
-  }
+mavenPublishing {
+    configure(JavaLibrary(JavadocJar.Javadoc()))
 }

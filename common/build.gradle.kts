@@ -1,27 +1,20 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+
 plugins {
-  `java-library`
-  `maven-publish`
+    `java-library`
+    alias(libs.plugins.maven.publish.base)
 }
 
-val moduleName = "lava-common"
-version = "1.1.2"
+base {
+    archivesName = "lava-common"
+}
 
 dependencies {
-  implementation("org.slf4j:slf4j-api:1.7.36")
-  implementation("commons-io:commons-io:2.11.0")
+    implementation(libs.slf4j)
+    implementation(libs.commons.io)
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
-  archiveClassifier.set("sources")
-  from(sourceSets["main"].allSource)
-}
-
-publishing {
-  publications {
-    create<MavenPublication>("mavenJava") {
-      from(components["java"])
-      artifactId = moduleName
-      artifact(sourcesJar)
-    }
-  }
+mavenPublishing {
+    configure(JavaLibrary(JavadocJar.Javadoc()))
 }

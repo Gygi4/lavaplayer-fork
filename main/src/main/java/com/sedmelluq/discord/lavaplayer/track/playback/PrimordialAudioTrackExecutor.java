@@ -68,6 +68,16 @@ public class PrimordialAudioTrackExecutor implements AudioTrackExecutor {
   }
 
   @Override
+  public void addMarker(TrackMarker marker) {
+    markerTracker.add(marker, getPosition());
+  }
+
+  @Override
+  public void removeMarker(TrackMarker marker) {
+    markerTracker.remove(marker);
+  }
+
+  @Override
   public boolean failedBeforeLoad() {
     return false;
   }
@@ -103,6 +113,10 @@ public class PrimordialAudioTrackExecutor implements AudioTrackExecutor {
       executor.setPosition(position);
     }
 
-    executor.setMarker(markerTracker.remove());
+    for (TrackMarker marker : markerTracker.getMarkers()) {
+      executor.addMarker(marker);
+    }
+
+    markerTracker.clear();
   }
 }
