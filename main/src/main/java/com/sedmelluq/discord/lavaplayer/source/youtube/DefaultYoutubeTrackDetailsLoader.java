@@ -55,8 +55,8 @@ public class DefaultYoutubeTrackDetailsLoader implements YoutubeTrackDetailsLoad
       }
 
       if (!videoId.equals(initialData.playerResponse.get("videoDetails").get("videoId").text())) {
-        throw new FriendlyException("Video returned by YouTube isn't what was requested", COMMON,
-                new IllegalStateException(initialData.playerResponse.format()));
+        log.debug("Video returned by YouTube isn't what was requested {}", initialData.playerResponse.get("videoDetails").get("videoId").text());
+        log.debug("Requested video id: {}", videoId);
       }
 
       YoutubeTrackJsonData finalData = augmentWithPlayerScript(initialData, httpInterface, videoId, requireFormats);
