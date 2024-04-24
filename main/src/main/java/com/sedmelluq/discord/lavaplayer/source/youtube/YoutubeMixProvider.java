@@ -44,7 +44,7 @@ public class YoutubeMixProvider implements YoutubeMixLoader {
     List<AudioTrack> tracks = new ArrayList<>();
 
     HttpPost post = new HttpPost(NEXT_URL);
-    YoutubeClientConfig clientConfig = YoutubeClientConfig.WEB.copy()
+    YoutubeClientConfig clientConfig = YoutubeClientConfig.ANDROID.copy()
             .withRootField("videoId", selectedVideoId)
             .withRootField("playlistId", mixId)
             .setAttribute(httpInterface);
