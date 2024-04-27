@@ -7,8 +7,6 @@ include(
     ":extensions",
     ":extensions:youtube-rotator",
     ":extensions:format-xm",
-    ":natives",
-    ":natives-publish",
     ":testbot"
 )
 
@@ -49,6 +47,7 @@ fun VersionCatalogBuilder.common() {
 }
 
 fun VersionCatalogBuilder.others() {
+    library("lavaplayer-natives-fork", "com.github.davidffa", "lavaplayer-natives-fork").version("1.0.9")
     library("ibxm-fork", "com.github.walkyst", "ibxm-fork").version("a75")
     library("jaadec-fork", "com.github.walkyst", "JAADec-fork").version("0.1.3")
     library("rhino-engine", "org.mozilla", "rhino-engine").version("1.7.14")
