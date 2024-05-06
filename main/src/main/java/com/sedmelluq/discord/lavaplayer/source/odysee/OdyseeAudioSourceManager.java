@@ -3,10 +3,7 @@ package com.sedmelluq.discord.lavaplayer.source.odysee;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.*;
-import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
-import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
-import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
-import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterfaceManager;
+import com.sedmelluq.discord.lavaplayer.tools.io.*;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
@@ -44,6 +41,11 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
   private static final Pattern SEARCH_PATTERN = Pattern.compile(SEARCH_PREFIX + "(.{3,99999})");
 
   private final HttpInterfaceManager httpInterfaceManager;
+  private static final RequestConfig requestConfig = RequestConfig.custom()
+    .setConnectTimeout(20000)
+    .setConnectionRequestTimeout(20000)
+    .setSocketTimeout(20000)
+    .build();
   private final boolean allowSearch;
 
   public OdyseeAudioSourceManager() {
@@ -52,7 +54,13 @@ public class OdyseeAudioSourceManager implements AudioSourceManager, HttpConfigu
 
   public OdyseeAudioSourceManager(boolean allowSearch) {
     this.allowSearch = allowSearch;
-    httpInterfaceManager = HttpClientTools.createDefaultThreadLocalManager();
+    this.httpInterfaceManager = new ThreadLocalHttpInterfaceManager(
+      HttpClientTools
+        .createSharedCookiesHttpBuilder()
+        .setRedirectStrategy(new HttpClientTools.NoRedirectsStrategy()),
+      requestConfig
+    );
+    httpInterfaceManager.setHttpContextFilter(new OdyseeHttpContextFilter());
   }
 
   @Override
