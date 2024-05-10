@@ -1,41 +1,23 @@
 package com.sedmelluq.discord.lavaplayer.player;
 
 import com.sedmelluq.discord.lavaplayer.filter.PcmFilterFactory;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener;
-import com.sedmelluq.discord.lavaplayer.player.event.PlayerPauseEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.PlayerResumeEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.TrackEndEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.TrackExceptionEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.TrackStartEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.TrackStuckEvent;
+import com.sedmelluq.discord.lavaplayer.player.event.*;
+import com.sedmelluq.discord.lavaplayer.tools.CopyOnUpdateIdentityList;
 import com.sedmelluq.discord.lavaplayer.tools.ExceptionTools;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.InternalAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.TrackStateListener;
-import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
-import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrameProvider;
-import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrameProviderTools;
-import com.sedmelluq.discord.lavaplayer.track.playback.AudioTrackExecutor;
-import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
-import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
+import com.sedmelluq.discord.lavaplayer.track.playback.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.CLEANUP;
-import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.FINISHED;
-import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.LOAD_FAILED;
-import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.REPLACED;
-import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.STOPPED;
+import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.*;
 
 /**
  * An audio player that is capable of playing audio tracks and provides audio frames from the currently playing track.
@@ -43,6 +25,7 @@ import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.STOPPED
 public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
   private static final Logger log = LoggerFactory.getLogger(AudioPlayer.class);
 
+  private volatile InternalAudioTrack scheduledTrack;
   private volatile InternalAudioTrack activeTrack;
   private volatile long lastRequestTime;
   private volatile long lastReceiveTime;
@@ -50,9 +33,10 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
   private volatile InternalAudioTrack shadowTrack;
   private final AtomicBoolean paused;
   private final DefaultAudioPlayerManager manager;
-  private final List<AudioEventListener> listeners;
+  private final CopyOnUpdateIdentityList<AudioEventListener> listeners;
   private final Object trackSwitchLock;
   private final AudioPlayerOptions options;
+  private AudioConfiguration configuration;
 
   /**
    * @param manager Audio player manager which this player is attached to
@@ -61,16 +45,63 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
     this.manager = manager;
     activeTrack = null;
     paused = new AtomicBoolean();
-    listeners = new ArrayList<>();
+    listeners = new CopyOnUpdateIdentityList<>();
     trackSwitchLock = new Object();
     options = new AudioPlayerOptions();
   }
 
+  private AudioConfiguration getMainConfiguration() {
+    return this.configuration == null ? manager.getConfiguration() : this.configuration;
+  }
+
+  @Override
+  public AudioConfiguration getConfiguration() {
+    if (configuration == null) {
+      configuration = manager.getConfiguration().copy();
+    }
+
+    return configuration;
+  }
+
   /**
-   * @return Currently playing track
+   * @return Currently playing track, or null
    */
   public AudioTrack getPlayingTrack() {
     return activeTrack;
+  }
+
+  /**
+   * @return Currently scheduled track, or null
+   */
+  public AudioTrack getScheduledTrack() {
+    return scheduledTrack;
+  }
+
+  /**
+   * Schedules the next track to be played. This will not trigger the track to be immediately played,
+   * but rather schedules it to play after the current track has finished. If there is no playing track,
+   * this function will return false
+   * @param track The track to schedule. This will overwrite the currently scheduled track, if one exists.
+   *              Passing null will clear the current scheduled track.
+   * @return True if the track was scheduled
+   */
+  public boolean scheduleTrack(AudioTrack track) {
+    if (activeTrack == null) {
+      return false;
+    }
+
+    synchronized (trackSwitchLock) {
+      if (scheduledTrack != null) {
+        scheduledTrack.stop();
+      }
+
+      InternalAudioTrack newTrack = (InternalAudioTrack) track;
+      scheduledTrack = newTrack;
+
+      manager.executeTrack(this, newTrack, getMainConfiguration(), options);
+    }
+
+    return true;
   }
 
   /**
@@ -81,6 +112,7 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
   }
 
   /**
+   * Starts a new track. This will clear any scheduled tracks.
    * @param track The track to start playing, passing null will stop the current track and return false
    * @param noInterrupt Whether to only start if nothing else is playing
    * @return True if the track was started
@@ -94,6 +126,11 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
 
       if (noInterrupt && previousTrack != null) {
         return false;
+      }
+
+      if (scheduledTrack != null) {
+        scheduledTrack.stop();
+        scheduledTrack = null;
       }
 
       activeTrack = newTrack;
@@ -116,27 +153,51 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
 
     dispatchEvent(new TrackStartEvent(this, newTrack));
 
-    manager.executeTrack(this, newTrack, manager.getConfiguration(), options);
+    manager.executeTrack(this, newTrack, getMainConfiguration(), options);
     return true;
   }
 
   /**
    * Stop currently playing track.
    */
-  public void stopTrack() {
-    stopWithReason(STOPPED);
+  public void stopCurrentTrack() {
+    stopWithReason(STOPPED, false);
   }
 
-  private void stopWithReason(AudioTrackEndReason reason) {
+  /**
+   * Stop currently playing track and any scheduled tracks.
+   */
+  public void stopTrack() {
+    stopWithReason(STOPPED, true);
+  }
+
+  private void stopWithReason(AudioTrackEndReason reason, boolean includeScheduled) {
     shadowTrack = null;
 
     synchronized (trackSwitchLock) {
+      if (includeScheduled && scheduledTrack != null) {
+        scheduledTrack.stop();
+        scheduledTrack = null;
+      }
+
       InternalAudioTrack previousTrack = activeTrack;
-      activeTrack = null;
+      boolean swapped = false;
+
+      if (scheduledTrack != null) {
+        activeTrack = scheduledTrack;
+        scheduledTrack = null;
+        swapped = true;
+      } else {
+        activeTrack = null;
+      }
 
       if (previousTrack != null) {
         previousTrack.stop();
         dispatchEvent(new TrackEndEvent(this, previousTrack, reason));
+      }
+
+      if (swapped && activeTrack != null) {
+        dispatchEvent(new TrackStartEvent(this, activeTrack));
       }
     }
   }
@@ -222,7 +283,7 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
 
   @Override
   public boolean provide(MutableAudioFrame targetFrame, long timeout, TimeUnit unit)
-      throws TimeoutException, InterruptedException {
+    throws TimeoutException, InterruptedException {
 
     InternalAudioTrack track;
 
@@ -257,13 +318,25 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
   private void handleTerminator(InternalAudioTrack track) {
     synchronized (trackSwitchLock) {
       if (activeTrack == track) {
-        InternalAudioTrack oldTrack = activeTrack;
+        activeTrack = null;
 
-        try {
-          activeTrack = null;
-          dispatchEvent(new TrackEndEvent(this, track, track.getActiveExecutor().failedBeforeLoad() ? LOAD_FAILED : FINISHED));
-        } finally {
-          oldTrack.stop();
+        boolean failedBeforeLoad = track.getActiveExecutor().failedBeforeLoad();
+        boolean swapped = false;
+
+        AudioTrackEndReason endReason = scheduledTrack != null
+          ? (failedBeforeLoad ? LOAD_FAILED_GAPLESS : FINISHED_GAPLESS)
+          : (failedBeforeLoad ? LOAD_FAILED : FINISHED);
+
+        if (scheduledTrack != null) {
+          activeTrack = scheduledTrack;
+          scheduledTrack = null;
+          swapped = true;
+        }
+
+        dispatchEvent(new TrackEndEvent(this, track, endReason));
+
+        if (swapped && activeTrack != null) {
+          dispatchEvent(new TrackStartEvent(this, activeTrack));
         }
       }
     }
@@ -356,11 +429,7 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
    */
   public void removeListener(AudioEventListener listener) {
     synchronized (trackSwitchLock) {
-      for (Iterator<AudioEventListener> iterator = listeners.iterator(); iterator.hasNext(); ) {
-        if (iterator.next() == listener) {
-          iterator.remove();
-        }
-      }
+      listeners.remove(listener);
     }
   }
 
@@ -368,7 +437,7 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
     log.debug("Firing an event with class {}", event.getClass().getSimpleName());
 
     synchronized (trackSwitchLock) {
-      for (AudioEventListener listener : listeners) {
+      for (AudioEventListener listener : listeners.items) {
         try {
           listener.onEvent(event);
         } catch (Exception e) {
@@ -380,6 +449,15 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
 
   @Override
   public void onTrackException(AudioTrack track, FriendlyException exception) {
+    if (track == scheduledTrack) {
+      synchronized (trackSwitchLock) {
+        if (track == scheduledTrack) {
+          scheduledTrack.stop();
+          scheduledTrack = null;
+        }
+      }
+    }
+
     dispatchEvent(new TrackExceptionEvent(this, track, exception));
   }
 
@@ -397,7 +475,7 @@ public class DefaultAudioPlayer implements AudioPlayer, TrackStateListener {
     if (track != null && System.currentTimeMillis() - lastRequestTime >= threshold) {
       log.debug("Triggering cleanup on an audio player playing track {}", track);
 
-      stopWithReason(CLEANUP);
+      stopWithReason(CLEANUP, true);
     }
   }
 }

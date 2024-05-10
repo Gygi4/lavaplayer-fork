@@ -1,48 +1,29 @@
 package com.sedmelluq.discord.lavaplayer.player;
 
 import com.sedmelluq.discord.lavaplayer.filter.PcmFilterFactory;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener;
-import com.sedmelluq.discord.lavaplayer.player.event.PlayerPauseEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.PlayerResumeEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.TrackEndEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.TrackExceptionEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.TrackStartEvent;
-import com.sedmelluq.discord.lavaplayer.player.event.TrackStuckEvent;
-import com.sedmelluq.discord.lavaplayer.tools.ExceptionTools;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import com.sedmelluq.discord.lavaplayer.track.InternalAudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.TrackStateListener;
-import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrameProvider;
-import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrameProviderTools;
-import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.CLEANUP;
-import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.FINISHED;
-import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.LOAD_FAILED;
-import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.REPLACED;
-import static com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason.STOPPED;
 
 /**
  * An audio player that is capable of playing audio tracks and provides audio frames from the currently playing track.
  */
 public interface AudioPlayer extends AudioFrameProvider {
+  default AudioConfiguration getConfiguration() {
+    throw new UnsupportedOperationException();
+  }
+
   /**
-   * @return Currently playing track
+   * @return Currently playing track, or null
    */
   AudioTrack getPlayingTrack();
+
+  /**
+   * @return Currently scheduled track, or null
+   */
+  default AudioTrack getScheduledTrack() {
+    throw new UnsupportedOperationException();
+  }
 
   /**
    * @param track The track to start playing
@@ -57,9 +38,45 @@ public interface AudioPlayer extends AudioFrameProvider {
   boolean startTrack(AudioTrack track, boolean noInterrupt);
 
   /**
-   * Stop currently playing track.
+   * Schedules the next track to be played. This will not trigger the track to be immediately played,
+   * but rather schedules it to play after the current track has finished. If there is no playing track,
+   * this function will return false
+   * @param track The track to schedule. This will overwrite the currently scheduled track, if one exists.
+   *              Passing null will clear the current scheduled track.
+   * @return True if the track was scheduled
+   */
+  default boolean scheduleTrack(AudioTrack track) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Identical to {@link #scheduleTrack(AudioTrack)} but the replaceExisting parameter will determine
+   * whether an existing scheduled track will be overwritten.
+   * If replaceExisting is false and a track is scheduled, this  will return false.
+   * If there is no playing track, this will return false.
+   * @param track The track to schedule.
+   * @param replaceExisting Whether to replace the current scheduled track, if one exists.
+   * @return True if the track was scheduled.
+   */
+  default boolean scheduleTrack(AudioTrack track, boolean replaceExisting) {
+    if (!replaceExisting && getScheduledTrack() != null) {
+      return false;
+    }
+
+    return scheduleTrack(track);
+  }
+
+  /**
+   * Stop currently playing track. This will also clear any scheduled tracks.
    */
   void stopTrack();
+
+  /**
+   * Stop currently playing track.
+   */
+  default void stopCurrentTrack() {
+    throw new UnsupportedOperationException();
+  }
 
   int getVolume();
 

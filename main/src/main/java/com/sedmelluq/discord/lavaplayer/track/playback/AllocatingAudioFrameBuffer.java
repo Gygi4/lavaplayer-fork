@@ -112,6 +112,7 @@ public class AllocatingAudioFrameBuffer extends AbstractAudioFrameBuffer {
         targetFrame.store(frame.getData(), 0, frame.getDataLength());
         targetFrame.setTerminator(false);
         targetFrame.setFormat(frame.getFormat());
+        targetFrame.setFlags(frame.getFlags());
       }
 
       return true;
@@ -196,7 +197,7 @@ public class AllocatingAudioFrameBuffer extends AbstractAudioFrameBuffer {
 
   private AudioFrame filterFrame(AudioFrame frame) {
     if (frame != null && frame.getVolume() == 0) {
-      return new ImmutableAudioFrame(frame.getTimecode(), format.silenceBytes(), 0, format);
+      return new ImmutableAudioFrame(frame.getTimecode(), format.silenceBytes(), 0, format, frame.getFlags());
     }
 
     return frame;

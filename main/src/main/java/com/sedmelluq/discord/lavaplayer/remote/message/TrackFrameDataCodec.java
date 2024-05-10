@@ -51,7 +51,7 @@ public class TrackFrameDataCodec implements RemoteMessageCodec<TrackFrameDataMes
       byte[] data = new byte[in.readInt()];
       in.readFully(data);
 
-      frames.add(new ImmutableAudioFrame(timecode, data, in.readInt(), null));
+      frames.add(new ImmutableAudioFrame(timecode, data, in.readInt(), null, AudioFrame.DEFAULT_FLAGS));
     }
 
     return new TrackFrameDataMessage(executorId, frames, in.readBoolean(), in.readLong());

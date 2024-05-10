@@ -227,15 +227,15 @@ public class Mp3TrackProvider implements AudioTrackInfoProvider {
 
   private int readSyncProofInteger() throws IOException {
     return (dataInput.readByte() & 0xFF) << 21
-        | (dataInput.readByte() & 0xFF) << 14
-        | (dataInput.readByte() & 0xFF) << 7
-        | (dataInput.readByte() & 0xFF);
+      | (dataInput.readByte() & 0xFF) << 14
+      | (dataInput.readByte() & 0xFF) << 7
+      | (dataInput.readByte() & 0xFF);
   }
 
   private int readSyncProof3ByteInteger() throws IOException {
     return (dataInput.readByte() & 0xFF) << 14
-        | (dataInput.readByte() & 0xFF) << 7
-        | (dataInput.readByte() & 0xFF);
+      | (dataInput.readByte() & 0xFF) << 7
+      | (dataInput.readByte() & 0xFF);
   }
 
   private void skipExtendedHeader(int flags) throws IOException {
@@ -275,13 +275,13 @@ public class Mp3TrackProvider implements AudioTrackInfoProvider {
 
     switch (encoding) {
       case 0:
-        return new String(data, 0, size - (shortTerminator ? 2 : 1), "ISO-8859-1");
+        return new String(data, 0, size - (shortTerminator ? 2 : 1), StandardCharsets.ISO_8859_1);
       case 1:
-        return new String(data, 0, size - (wideTerminator ? 3 : 1), "UTF-16");
+        return new String(data, 0, size - (wideTerminator ? 3 : 1), StandardCharsets.UTF_16);
       case 2:
-        return new String(data, 0, size - (wideTerminator ? 3 : 1), "UTF-16BE");
+        return new String(data, 0, size - (wideTerminator ? 3 : 1), StandardCharsets.UTF_16BE);
       case 3:
-        return new String(data, 0, size - (shortTerminator ? 2 : 1), "UTF-8");
+        return new String(data, 0, size - (shortTerminator ? 2 : 1), StandardCharsets.UTF_8);
       default:
         return null;
     }

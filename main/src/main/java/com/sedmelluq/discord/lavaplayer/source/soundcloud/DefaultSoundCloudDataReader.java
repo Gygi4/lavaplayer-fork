@@ -28,15 +28,20 @@ public class DefaultSoundCloudDataReader implements SoundCloudDataReader {
 
   @Override
   public AudioTrackInfo readTrackInfo(JsonBrowser trackData, String identifier) {
-    return new AudioTrackInfo(
+    boolean hasSnippedStreams = trackData.get("media").get("transcodings").values().stream()
+      .anyMatch(transcoding -> transcoding.get("snipped").asBoolean(false));
+
+    return new SoundcloudAudioTrackInfo(
         trackData.get("title").safeText(),
         trackData.get("user").get("username").safeText(),
         trackData.get("full_duration").as(Integer.class),
         identifier,
         false,
         trackData.get("permalink_url").text(),
+        trackData.get("monetization_model").text(),
         ThumbnailTools.getSoundCloudThumbnail(trackData),
-        trackData.get("publisher_metadata").get("isrc").text()
+        trackData.get("publisher_metadata").get("isrc").text(),
+        hasSnippedStreams
     );
   }
 

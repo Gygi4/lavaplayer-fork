@@ -366,7 +366,7 @@ public class RemoteNodeProcessor implements RemoteNode, Runnable {
       AudioDataFormat format = executor.getConfiguration().getOutputFormat();
 
       for (AudioFrame frame : message.frames) {
-        buffer.consume(new ImmutableAudioFrame(frame.getTimecode(), frame.getData(), frame.getVolume(), format));
+        buffer.consume(new ImmutableAudioFrame(frame.getTimecode(), frame.getData(), frame.getVolume(), format, frame.getFlags()));
       }
 
       if (message.finished) {
@@ -479,7 +479,7 @@ public class RemoteNodeProcessor implements RemoteNode, Runnable {
   public List<Tick> getLastTicks(boolean reset) {
     synchronized (tickHistory) {
       List<Tick> result = new ArrayList<>(tickHistory);
-      
+
       if (reset) {
         tickHistory.clear();
       }

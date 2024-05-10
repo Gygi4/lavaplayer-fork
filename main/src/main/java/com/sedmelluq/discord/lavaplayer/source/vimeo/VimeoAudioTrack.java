@@ -52,12 +52,10 @@ public class VimeoAudioTrack extends DelegatedAudioTrack {
       log.debug("Starting Vimeo track. HLS: {}, URL: {}", playbackSource.isHls, playbackSource.url);
 
       if (playbackSource.isHls) {
-        processDelegate(new HlsStreamTrack(
-                trackInfo,
-                extractHlsAudioPlaylistUrl(httpInterface, playbackSource.url),
-                sourceManager.getHttpInterfaceManager(),
-                true
-        ), localExecutor);
+        processDelegate(
+          new HlsStreamTrack(trackInfo, extractHlsAudioPlaylistUrl(httpInterface, playbackSource.url), sourceManager.getHttpInterfaceManager(), true),
+          localExecutor
+        );
       } else {
         try (PersistentHttpStream stream = new PersistentHttpStream(httpInterface, new URI(playbackSource.url), null)) {
           processDelegate(new MpegAudioTrack(trackInfo, stream), localExecutor);
@@ -102,7 +100,7 @@ public class VimeoAudioTrack extends DelegatedAudioTrack {
 
       if (!HttpClientTools.isSuccessWithContent(statusCode)) {
         throw new FriendlyException("Server responded with an error.", SUSPICIOUS,
-            new IllegalStateException("Response code for player config is " + statusCode));
+          new IllegalStateException("Response code for player config is " + statusCode));
       }
 
       return sourceManager.loadConfigJsonFromPageContent(IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
@@ -115,7 +113,7 @@ public class VimeoAudioTrack extends DelegatedAudioTrack {
 
       if (!HttpClientTools.isSuccessWithContent(statusCode)) {
         throw new FriendlyException("Server responded with an error.", SUSPICIOUS,
-            new IllegalStateException("Response code for track access info is " + statusCode));
+          new IllegalStateException("Response code for track access info is " + statusCode));
       }
 
       return JsonBrowser.parse(response.getEntity().getContent());
@@ -139,22 +137,24 @@ public class VimeoAudioTrack extends DelegatedAudioTrack {
 
       if (!HttpClientTools.isSuccessWithContent(statusCode)) {
         throw new FriendlyException("Server responded with an error.", SUSPICIOUS,
-                new IllegalStateException("Response code for track access info is " + statusCode));
+          new IllegalStateException("Response code for track access info is " + statusCode));
       }
 
       String bodyString = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
       for (String rawLine : bodyString.split("\n")) {
         ExtendedM3uParser.Line line = ExtendedM3uParser.parseLine(rawLine);
-        if (Objects.equals(line.directiveName, "EXT-X-MEDIA")
-                && Objects.equals(line.directiveArguments.get("TYPE"), "AUDIO")) {
+
+        if (Objects.equals(line.directiveName, "EXT-X-MEDIA") && Objects.equals(line.directiveArguments.get("TYPE"), "AUDIO")) {
           url = line.directiveArguments.get("URI");
           break;
         }
       }
     }
 
-    if (url == null) throw new FriendlyException("Failed to find audio playlist URL.", SUSPICIOUS,
-            new IllegalStateException("Valid audio directive was not found"));
+    if (url == null) {
+      throw new FriendlyException("Failed to find audio playlist URL.", SUSPICIOUS,
+        new IllegalStateException("Valid audio directive was not found"));
+    }
 
     return resolveRelativeUrl(videoPlaylistUrl.substring(0, videoPlaylistUrl.lastIndexOf('/')), url);
   }

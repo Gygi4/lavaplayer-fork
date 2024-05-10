@@ -9,6 +9,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +119,8 @@ public class PersistentHttpStream extends SeekableInputStream implements AutoClo
   }
 
   private boolean attemptConnect(boolean skipStatusCheck, boolean retryOnServerError) throws IOException {
-    currentResponse = httpInterface.execute(getConnectRequest());
+    HttpUriRequest request = getConnectRequest();
+    currentResponse = httpInterface.execute(request);
     lastStatusCode = currentResponse.getStatusLine().getStatusCode();
 
     if (!skipStatusCheck && !validateStatusCode(currentResponse, retryOnServerError)) {

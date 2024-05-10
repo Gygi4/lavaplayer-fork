@@ -69,7 +69,7 @@ public class AudioFrameVolumeChanger implements AudioFrameRebuilder {
       Thread.currentThread().interrupt();
     }
 
-    return new ImmutableAudioFrame(frame.getTimecode(), bytes, targetVolume, format);
+    return new ImmutableAudioFrame(frame.getTimecode(), bytes, targetVolume, format, frame.getFlags());
   }
 
   private void setupLibraries() {

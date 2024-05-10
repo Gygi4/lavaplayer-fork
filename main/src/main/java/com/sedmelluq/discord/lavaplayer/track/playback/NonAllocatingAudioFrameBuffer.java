@@ -183,6 +183,7 @@ public class NonAllocatingAudioFrameBuffer extends AbstractAudioFrameBuffer {
     targetFrame.setTerminator(false);
     targetFrame.store(frame.getFrameBuffer(), frame.getFrameOffset(), frame.getDataLength());
     targetFrame.setFormat(frame.getFormat());
+    targetFrame.setFlags(frame.getFlags());
 
     firstFrame = wrappedFrameIndex(firstFrame + 1);
     frameCount--;
@@ -193,6 +194,7 @@ public class NonAllocatingAudioFrameBuffer extends AbstractAudioFrameBuffer {
     terminated = true;
 
     frame.setTerminator(true);
+    frame.setFlags();
   }
 
   @Override
@@ -269,6 +271,7 @@ public class NonAllocatingAudioFrameBuffer extends AbstractAudioFrameBuffer {
     targetFrame.setTimecode(frame.getTimecode());
     targetFrame.setVolume(frame.getVolume());
     targetFrame.setDataReference(frameBuffer, frameOffset, frameLength);
+    targetFrame.setFlags(frame.getFlags());
 
     frame.getData(frameBuffer, frameOffset);
 
@@ -289,7 +292,7 @@ public class NonAllocatingAudioFrameBuffer extends AbstractAudioFrameBuffer {
       return TerminatorAudioFrame.INSTANCE;
     } else {
       return new ImmutableAudioFrame(bridgeFrame.getTimecode(), bridgeFrame.getData(), bridgeFrame.getVolume(),
-          bridgeFrame.getFormat());
+          bridgeFrame.getFormat(), bridgeFrame.getFlags());
     }
   }
 
