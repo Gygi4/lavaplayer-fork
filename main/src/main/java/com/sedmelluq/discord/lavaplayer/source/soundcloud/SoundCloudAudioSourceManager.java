@@ -159,7 +159,7 @@ public class SoundCloudAudioSourceManager implements AudioSourceManager, HttpCon
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
     DataInputStream stream = (DataInputStream) input;
 
     if (stream.available() <= 8 || !stream.markSupported()) {
