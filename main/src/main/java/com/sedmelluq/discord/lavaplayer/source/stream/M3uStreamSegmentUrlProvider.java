@@ -28,8 +28,7 @@ import static com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools.fetchRes
  */
 public abstract class M3uStreamSegmentUrlProvider {
   private static final long SEGMENT_WAIT_STEP_MS = 200;
-  private static final RequestConfig streamingRequestConfig =
-  RequestConfig.custom().setSocketTimeout(5000).setConnectionRequestTimeout(5000).setConnectTimeout(5000).build();
+  private static final RequestConfig streamingRequestConfig = RequestConfig.custom().setSocketTimeout(5000).setConnectionRequestTimeout(5000).setConnectTimeout(5000).build();
 
   protected String baseUrl;
   protected SegmentInfo lastSegment;
@@ -122,11 +121,7 @@ public abstract class M3uStreamSegmentUrlProvider {
 
     try {
       response = httpInterface.execute(createSegmentGetRequest(url));
-      int statusCode = response.getStatusLine().getStatusCode();
-
-      if (!HttpClientTools.isSuccessWithContent(statusCode)) {
-        throw new IOException("Invalid status code from segment data URL: " + statusCode);
-      }
+      HttpClientTools.assertSuccessWithContent(response, "segment data URL");
 
       success = true;
       return response.getEntity().getContent();
@@ -165,16 +160,12 @@ public abstract class M3uStreamSegmentUrlProvider {
 
       if (line.isData() && streamInfoLine != null) {
         String quality = getQualityFromM3uDirective(streamInfoLine);
-
         if (quality != null) {
-          streams.add(new ChannelStreamInfo(quality, isAbsoluteUrl(line.lineData)
-                  ? line.lineData :
-                  getAbsoluteUrl(line.lineData)
-          ));
+          streams.add(new ChannelStreamInfo(quality, isAbsoluteUrl(line.lineData) ? line.lineData : getAbsoluteUrl(line.lineData)));
         }
 
         streamInfoLine = null;
-      } else if (line.isDirective() && "EXT-X-STREAM-INF".equals(line.directiveName)) {
+      } else if (line.isDirective() && ("EXT-X-STREAM-INF".equals(line.directiveName) || "EXTINF".equals(line.directiveName))) {
         streamInfoLine = line;
       }
     }

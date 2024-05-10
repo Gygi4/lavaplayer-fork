@@ -8,20 +8,12 @@ import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterfaceManager;
-import com.sedmelluq.discord.lavaplayer.track.*;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import com.sedmelluq.discord.lavaplayer.track.AudioItem;
+import com.sedmelluq.discord.lavaplayer.track.AudioReference;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +23,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.COMMON;
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS;
@@ -148,13 +149,69 @@ public class SoundCloudAudioSourceManager implements AudioSourceManager, HttpCon
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) {
-    // No extra information to save
+  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
+    if (track.getInfo() instanceof SoundcloudAudioTrackInfo) {
+      SoundcloudAudioTrackInfo trackInfo = (SoundcloudAudioTrackInfo) track.getInfo();
+
+      output.writeUTF(trackInfo.monetizationModel);
+      output.writeBoolean(trackInfo.snipped);
+    }
   }
 
   @Override
   public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
-    return new SoundCloudAudioTrack(trackInfo, this);
+    DataInputStream stream = (DataInputStream) input;
+
+    if (stream.available() <= 8 || !stream.markSupported()) {
+      // This is a bit of a hack to determine if there's any source-manager specific data to be
+      // read here. As source managers don't write versioned information by default, we can't rely
+      // on an `int` field denoting v1, v2, v3 etc. As of this implementation, the only field read
+      // after calling `decodeTrackDetails` is a long denoting the track's position, and as a long
+      // is only 8 bytes we can, with some confidence, just check `input.available()`.
+      return new SoundCloudAudioTrack(trackInfo, this);
+    }
+
+    // The expected ByteArrayInputStream that input encompasses doesn't do anything with
+    // the readLimit parameter, however it is provided an arbitrary value in the event
+    // that we do not receive the input stream type we were expecting.
+    stream.mark(1024);
+
+    AudioTrackInfo info = trackInfo;
+
+    try {
+      short mmLength = input.readShort();
+      stream.reset();
+
+      // dirty patch to fix issues with users encoding their own data onto the end of track strings
+      // which causes the `available() <= 8` check to pass and then the source manager erroneously
+      // tries to read data that doesn't belong to it.
+      if (mmLength == 0 || mmLength > 15) {
+        return new SoundCloudAudioTrack(trackInfo, this);
+      }
+
+      String monetizationModel = input.readUTF();
+      boolean snipped = input.readBoolean();
+
+      info = new SoundcloudAudioTrackInfo(
+        trackInfo.title,
+        trackInfo.author,
+        trackInfo.length,
+        trackInfo.identifier,
+        trackInfo.isStream,
+        trackInfo.uri,
+        monetizationModel,
+        trackInfo.artworkUrl,
+        trackInfo.isrc,
+        snipped
+      );
+    } catch (IOException e) {
+      stream.reset();
+      // We don't strictly need to log anything here as it's an IOException we expect
+      // specifically in the event of decoding *older* tracks that didn't have the new
+      // trackInfo fields.
+    }
+
+    return new SoundCloudAudioTrack(info, this);
   }
 
   @Override
