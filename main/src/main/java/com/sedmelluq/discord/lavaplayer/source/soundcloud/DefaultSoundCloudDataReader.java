@@ -3,10 +3,11 @@ package com.sedmelluq.discord.lavaplayer.source.soundcloud;
 import com.sedmelluq.discord.lavaplayer.tools.JsonBrowser;
 import com.sedmelluq.discord.lavaplayer.tools.ThumbnailTools;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DefaultSoundCloudDataReader implements SoundCloudDataReader {
   private static final Logger log = LoggerFactory.getLogger(DefaultSoundCloudDataReader.class);
@@ -28,20 +29,15 @@ public class DefaultSoundCloudDataReader implements SoundCloudDataReader {
 
   @Override
   public AudioTrackInfo readTrackInfo(JsonBrowser trackData, String identifier) {
-    boolean hasSnippedStreams = trackData.get("media").get("transcodings").values().stream()
-      .anyMatch(transcoding -> transcoding.get("snipped").asBoolean(false));
-
-    return new SoundcloudAudioTrackInfo(
-        trackData.get("title").safeText(),
-        trackData.get("user").get("username").safeText(),
-        trackData.get("full_duration").as(Integer.class),
-        identifier,
-        false,
-        trackData.get("permalink_url").text(),
-        trackData.get("monetization_model").text(),
-        ThumbnailTools.getSoundCloudThumbnail(trackData),
-        trackData.get("publisher_metadata").get("isrc").text(),
-        hasSnippedStreams
+    return new AudioTrackInfo(
+      trackData.get("title").safeText(),
+      trackData.get("user").get("username").safeText(),
+      trackData.get("full_duration").as(Integer.class),
+      identifier,
+      false,
+      trackData.get("permalink_url").text(),
+      ThumbnailTools.getSoundCloudThumbnail(trackData),
+      trackData.get("publisher_metadata").get("isrc").text()
     );
   }
 
