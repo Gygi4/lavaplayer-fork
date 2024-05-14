@@ -35,7 +35,7 @@ fun VersionCatalogBuilder.common() {
     library("slf4j", "org.slf4j", "slf4j-api").version("2.0.13")
     library("commons-io", "commons-io", "commons-io").version("2.16.1")
 
-    version("jackson", "2.17.0")
+    version("jackson", "2.17.1")
     library("jackson-core", "com.fasterxml.jackson.core", "jackson-core").versionRef("jackson")
     library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
 
@@ -49,7 +49,7 @@ fun VersionCatalogBuilder.common() {
 fun VersionCatalogBuilder.others() {
     library("lavaplayer-natives-fork", "com.github.devoxin", "lavaplayer-natives-fork").version("0a17a66")
     library("ibxm-fork", "com.github.walkyst", "ibxm-fork").version("a75")
-    library("rhino-engine", "org.mozilla", "rhino-engine").version("1.7.14")
+    library("rhino-engine", "org.mozilla", "rhino-engine").version("1.7.15")
 }
 
 fun VersionCatalogBuilder.test() {
