@@ -119,8 +119,7 @@ public class PersistentHttpStream extends SeekableInputStream implements AutoClo
   }
 
   private boolean attemptConnect(boolean skipStatusCheck, boolean retryOnServerError) throws IOException {
-    HttpUriRequest request = getConnectRequest();
-    currentResponse = httpInterface.execute(request);
+    currentResponse = httpInterface.execute(getConnectRequest());
     lastStatusCode = currentResponse.getStatusLine().getStatusCode();
 
     if (!skipStatusCheck && !validateStatusCode(currentResponse, retryOnServerError)) {
@@ -181,9 +180,7 @@ public class PersistentHttpStream extends SeekableInputStream implements AutoClo
 
     try {
       int result = currentContent.read(b, off, len);
-      if (result >= 0) {
-        position += result;
-      }
+      position += result;
       return result;
     } catch (IOException e) {
       handleNetworkException(e, attemptReconnect);
