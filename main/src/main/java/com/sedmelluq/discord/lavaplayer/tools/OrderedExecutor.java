@@ -31,7 +31,7 @@ public class OrderedExecutor {
    * @return Future for the task
    */
   public Future<Void> submit(Object orderingKey, Runnable runnable) {
-    RunnableFuture<Void> runnableFuture = newTaskFor(runnable, null);
+    RunnableFuture<Void> runnableFuture = newTaskFor(runnable);
     queueOrSubmit(new ChannelRunnable(orderingKey), runnableFuture);
     return runnableFuture;
   }
@@ -64,8 +64,8 @@ public class OrderedExecutor {
     }
   }
 
-  private <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-    return new FutureTask<>(runnable, value);
+  private <T> RunnableFuture<T> newTaskFor(Runnable runnable) {
+    return new FutureTask<>(runnable, null);
   }
 
   private <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {

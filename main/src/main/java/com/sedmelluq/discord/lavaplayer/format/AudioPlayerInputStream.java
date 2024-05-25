@@ -1,9 +1,7 @@
 package com.sedmelluq.discord.lavaplayer.format;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayer;
 import com.sedmelluq.discord.lavaplayer.tools.ExceptionTools;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.TrackStateListener;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 
@@ -45,7 +43,7 @@ public class AudioPlayerInputStream extends InputStream {
   @Override
   public int read() throws IOException {
     ensureAvailable();
-    return current.get();
+    return current.get() & 0xFF;
   }
 
   @Override
@@ -64,12 +62,12 @@ public class AudioPlayerInputStream extends InputStream {
   }
 
   @Override
-  public int available() throws IOException {
+  public int available() {
     return current != null ? current.remaining() : 0;
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     player.stopTrack();
   }
 

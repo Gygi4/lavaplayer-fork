@@ -37,7 +37,7 @@ public class BitBufferReader extends BitStreamReader {
   }
 
   @Override
-  protected int readByte() throws IOException {
+  protected int readByte() {
     return buffer.get() & 0xFF;
   }
 }

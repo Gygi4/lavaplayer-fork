@@ -14,7 +14,7 @@ public abstract class ConverterAudioFilter implements UniversalPcmAudioFilter {
   }
 
   @Override
-  public void flush() throws InterruptedException {
+  public void flush() {
     // Nothing to do.
   }
 

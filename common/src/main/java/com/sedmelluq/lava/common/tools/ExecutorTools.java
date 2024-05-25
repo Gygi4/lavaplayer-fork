@@ -87,7 +87,7 @@ public class ExecutorTools {
         @Override
         public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
             if (!((EagerlyScalingTaskQueue) executor.getQueue()).offerDirectly(runnable)) {
-                throw new RejectedExecutionException("Task " + runnable.toString() + " rejected from " + runnable.toString());
+                throw new RejectedExecutionException("Task " + runnable.toString() + " rejected from " + runnable);
             }
         }
     }
@@ -109,12 +109,12 @@ public class ExecutorTools {
         }
 
         @Override
-        public Void get() throws InterruptedException, ExecutionException {
+        public Void get() {
             return null;
         }
 
         @Override
-        public Void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        public Void get(long timeout, TimeUnit unit) {
             return null;
         }
     }

@@ -54,7 +54,7 @@ public class BitStreamReader {
     long value = asLong(bitsNeeded);
 
     if ((value & (1L << (bitsNeeded - 1))) != 0) {
-      return value | ~((1L << bitsNeeded) - 1);
+      return value | -(1L << bitsNeeded);
     } else {
       return value;
     }
@@ -99,12 +99,10 @@ public class BitStreamReader {
 
   /**
    * Reads the number of bits it requires to make the reader align on a byte.
-   * @return The read bits as an unsigned value
    */
-  public int readRemainingBits() {
+  public void readRemainingBits() {
     int value = currentByte & ((1 << bitsLeft) - 1);
     bitsLeft = 0;
-    return value;
   }
 
   private void fill() throws IOException {

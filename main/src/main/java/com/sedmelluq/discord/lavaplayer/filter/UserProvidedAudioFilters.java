@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * An composite audio filter for filters provided by a {@link PcmFilterFactory}. Automatically rebuilds the chain
+ * A composite audio filter for filters provided by a {@link PcmFilterFactory}. Automatically rebuilds the chain
  * whenever the filter factory is changed.
  */
 public class UserProvidedAudioFilters extends CompositeAudioFilter {
@@ -83,7 +83,7 @@ public class UserProvidedAudioFilters extends CompositeAudioFilter {
     chain.input.process(input, offset, length);
   }
 
-  private void checkRebuild() throws InterruptedException {
+  private void checkRebuild() {
     if (hotSwapEnabled && context.playerOptions.filterFactory.get() != chain.context) {
       flush();
       close();

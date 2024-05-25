@@ -133,8 +133,4 @@ public class SavedHeadSeekableInputStream extends SeekableInputStream {
     delegate.close();
   }
 
-  @Override
-  public boolean markSupported() {
-    return false;
-  }
 }

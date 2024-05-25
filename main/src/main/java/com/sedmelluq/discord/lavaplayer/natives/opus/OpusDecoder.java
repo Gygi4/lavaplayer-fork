@@ -29,11 +29,11 @@ public class OpusDecoder extends NativeResourceHolder {
 
   /**
    * Encode the input buffer to output.
-   * @param directInput Input byte buffer
+   *
+   * @param directInput  Input byte buffer
    * @param directOutput Output sample buffer
-   * @return Number of bytes written to the output
    */
-  public int decode(ByteBuffer directInput, ShortBuffer directOutput) {
+  public void decode(ByteBuffer directInput, ShortBuffer directOutput) {
     checkNotReleased();
 
     if (!directInput.isDirect() || !directOutput.isDirect()) {
@@ -50,7 +50,6 @@ public class OpusDecoder extends NativeResourceHolder {
     directOutput.position(result * channels);
     directOutput.flip();
 
-    return result;
   }
 
   @Override

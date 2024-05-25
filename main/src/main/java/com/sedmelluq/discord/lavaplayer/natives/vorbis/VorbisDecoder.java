@@ -21,7 +21,7 @@ public class VorbisDecoder extends NativeResourceHolder {
 
   /**
    * Initialize the decoder by passing in identification and setup header data. See
-   * https://xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-170001.2.6 for definitions. The comment header is not required as
+   * <a href="https://xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-170001.2.6">...</a> for definitions. The comment header is not required as
    * it is not actually used for decoding setup.
    *
    * @param infoBuffer Identification header, including the 'vorbis' string.

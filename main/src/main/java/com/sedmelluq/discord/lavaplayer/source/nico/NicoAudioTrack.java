@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -86,7 +87,7 @@ public class NicoAudioTrack extends DelegatedAudioTrack {
       HttpClientTools.assertSuccessWithContent(response, "video main page");
 
       String urlEncodedData = DataFormatTools.extractBetween(EntityUtils.toString(response.getEntity()), "data-api-data=\"", "\"");
-      String watchData = Parser.unescapeEntities(urlEncodedData, false);
+      String watchData = Parser.unescapeEntities(Objects.requireNonNull(urlEncodedData), false);
 
       return JsonBrowser.parse(watchData);
     }

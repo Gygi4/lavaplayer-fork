@@ -19,7 +19,7 @@ import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.
 
 public abstract class AbstractYandexMusicApiLoader implements YandexMusicApiLoader {
 
-  protected HttpInterfaceManager httpInterfaceManager;
+  protected final HttpInterfaceManager httpInterfaceManager;
 
   AbstractYandexMusicApiLoader() {
     httpInterfaceManager = HttpClientTools.createDefaultThreadLocalManager();
@@ -62,6 +62,6 @@ public abstract class AbstractYandexMusicApiLoader implements YandexMusicApiLoad
   }
 
   protected interface ApiExtractor<T> {
-    T extract(HttpInterface httpInterface, JsonBrowser result) throws Exception;
+    T extract(HttpInterface httpInterface, JsonBrowser result);
   }
 }

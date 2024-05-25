@@ -20,7 +20,6 @@ import java.util.List;
 public class LocalSeekableInputStream extends SeekableInputStream {
   private static final Logger log = LoggerFactory.getLogger(LocalSeekableInputStream.class);
 
-  private final FileInputStream inputStream;
   private final FileChannel channel;
   private final ExtendedBufferedInputStream bufferedStream;
   private long position;
@@ -32,7 +31,7 @@ public class LocalSeekableInputStream extends SeekableInputStream {
     super(file.length(), 0);
 
     try {
-      inputStream = new FileInputStream(file);
+      FileInputStream inputStream = new FileInputStream(file);
       bufferedStream = new ExtendedBufferedInputStream(inputStream);
       channel = inputStream.getChannel();
     } catch (FileNotFoundException e) {
@@ -70,17 +69,7 @@ public class LocalSeekableInputStream extends SeekableInputStream {
   }
 
   @Override
-  public synchronized void reset() throws IOException {
-    throw new IOException("mark/reset not supported");
-  }
-
-  @Override
-  public boolean markSupported() {
-    return false;
-  }
-
-  @Override
-  public void close() throws IOException {
+  public void close() {
     try {
       channel.close();
     } catch (IOException e) {

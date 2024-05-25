@@ -77,13 +77,13 @@ public class Equalizer extends EqualizerConfiguration implements FloatPcmAudioFi
 
   @Override
   public void seekPerformed(long requestedTime, long providedTime) {
-    for (int channelIndex = 0; channelIndex < channels.length; channelIndex++) {
-      channels[channelIndex].reset();
+    for (ChannelProcessor channel : channels) {
+      channel.reset();
     }
   }
 
   @Override
-  public void flush() throws InterruptedException {
+  public void flush() {
     // Nothing to do here.
   }
 

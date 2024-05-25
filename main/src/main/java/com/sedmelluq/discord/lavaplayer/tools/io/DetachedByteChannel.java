@@ -34,7 +34,7 @@ public class DetachedByteChannel implements ReadableByteChannel {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     closed = true;
   }
 }

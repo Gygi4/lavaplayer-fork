@@ -23,7 +23,7 @@ public interface AudioPlayerManager {
   /**
    * Shut down the manager. All threads will be stopped, the manager cannot be used any further. All players created
    * with this manager will stop and all source managers registered to this manager will also be shut down.
-   *
+   * <p> <p>
    * Every thread created by the audio manager is a daemon thread, so calling this is not required for an application
    * to be able to gracefully shut down, however it should be called if the application continues without requiring this
    * manager any longer.
@@ -63,14 +63,14 @@ public interface AudioPlayerManager {
 
   /**
    * Schedules loading a track or playlist with the specified identifier.
+   *
    * @param identifier    The identifier that a specific source manager should be able to find the track with.
    * @param resultHandler A handler to process the result of this operation. It can either end by finding a track,
    *                      finding a playlist, finding nothing or terminating with an exception.
-   * @return A future for this operation
    * @see #loadItem(AudioReference, AudioLoadResultHandler)
    */
-  default Future<Void> loadItem(final String identifier, final AudioLoadResultHandler resultHandler) {
-    return loadItem(new AudioReference(identifier, null), resultHandler);
+  default void loadItem(final String identifier, final AudioLoadResultHandler resultHandler) {
+    loadItem(new AudioReference(identifier, null), resultHandler);
   }
 
   /**

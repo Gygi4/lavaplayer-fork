@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public interface Mp3Seeker {
   /**
-   * @return The duration of the file in milliseconds. May be an estimate.
+   * @return The duration of the file in milliseconds. Maybe an estimate.
    */
   long getDuration();
 

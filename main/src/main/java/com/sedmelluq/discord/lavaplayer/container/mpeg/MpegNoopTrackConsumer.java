@@ -31,12 +31,12 @@ public class MpegNoopTrackConsumer implements MpegTrackConsumer {
   }
 
   @Override
-  public void flush() throws InterruptedException {
+  public void flush() {
     // Nothing to do
   }
 
   @Override
-  public void consume(ReadableByteChannel channel, int length) throws InterruptedException {
+  public void consume(ReadableByteChannel channel, int length) {
     // Nothing to do
   }
 

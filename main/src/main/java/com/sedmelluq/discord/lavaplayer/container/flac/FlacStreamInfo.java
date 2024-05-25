@@ -6,8 +6,8 @@ import java.nio.ByteBuffer;
 
 /**
  * FLAC stream info metadata block contents. Field descriptions are from:
- * https://xiph.org/flac/format.html#metadata_block_streaminfo
- *
+ * <a href="https://xiph.org/flac/format.html#metadata_block_streaminfo">...</a>
+ * <p>
  * FLAC specifies a minimum block size of 16 and a maximum block size of 65535, meaning the bit patterns corresponding
  * to the numbers 0-15 in the minimum blocksize and maximum blocksize fields are invalid.
  */

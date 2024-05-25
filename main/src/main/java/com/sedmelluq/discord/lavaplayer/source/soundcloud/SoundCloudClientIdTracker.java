@@ -89,7 +89,7 @@ public class SoundCloudClientIdTracker {
 
       String page = EntityUtils.toString(response.getEntity());
       Matcher scriptMatcher = pageAppScriptPattern.matcher(page);
-      String result = getLastMatchWithinLimit(scriptMatcher, 9);
+      String result = getLastMatchWithinLimit(scriptMatcher);
 
       if (result != null) {
         return result;
@@ -99,9 +99,9 @@ public class SoundCloudClientIdTracker {
     }
   }
 
-  private String getLastMatchWithinLimit(Matcher m, int limit) {
+  private String getLastMatchWithinLimit(Matcher m) {
     String lastMatch = null;
-    for(int i = 0; m.find() && i < limit; ++i)
+    for(int i = 0; m.find() && i < 9; ++i)
       lastMatch = m.group();
     return lastMatch;
   }

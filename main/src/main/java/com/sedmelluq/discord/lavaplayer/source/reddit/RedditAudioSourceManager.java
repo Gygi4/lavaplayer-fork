@@ -135,12 +135,12 @@ public class RedditAudioSourceManager implements AudioSourceManager, HttpConfigu
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
+  public void encodeTrack(AudioTrack track, DataOutput output) {
     // nothing to encode here
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
     return new RedditAudioTrack(trackInfo, this);
   }
 

@@ -22,7 +22,7 @@ import static com.sedmelluq.discord.lavaplayer.source.youtube.YoutubePayloadHelp
 public class YoutubeClientConfig extends JSONObject {
     public static final AndroidVersion DEFAULT_ANDROID_VERSION = AndroidVersion.ANDROID_11;
 
-    public static YoutubeClientConfig ANDROID = new YoutubeClientConfig()
+    public static final YoutubeClientConfig ANDROID = new YoutubeClientConfig()
             .withApiKey(INNERTUBE_ANDROID_API_KEY)
             .withUserAgent(String.format("com.google.android.youtube/%s (Linux; U; Android %s) gzip", CLIENT_ANDROID_VERSION, DEFAULT_ANDROID_VERSION.getOsVersion()))
             .withClientName(CLIENT_ANDROID_NAME)
@@ -32,7 +32,7 @@ public class YoutubeClientConfig extends JSONObject {
             //.withClientField("osVersion", DEFAULT_ANDROID_VERSION.getOsVersion())
             .withClientDefaultScreenParameters();
 
-    public static YoutubeClientConfig TV_EMBEDDED = new YoutubeClientConfig()
+    public static final YoutubeClientConfig TV_EMBEDDED = new YoutubeClientConfig()
             .withApiKey(INNERTUBE_WEB_API_KEY) //.withApiKey(INNERTUBE_TV_API_KEY) // Requires header (Referer tv.youtube.com)
             .withClientName(CLIENT_TVHTML5_NAME)
             .withClientField("clientVersion", CLIENT_TVHTML5_VERSION)
@@ -40,12 +40,12 @@ public class YoutubeClientConfig extends JSONObject {
             .withClientDefaultScreenParameters()
             .withThirdPartyEmbedUrl(CLIENT_THIRD_PARTY_EMBED);
 
-    public static YoutubeClientConfig WEB = new YoutubeClientConfig()
+    public static final YoutubeClientConfig WEB = new YoutubeClientConfig()
             .withApiKey(INNERTUBE_WEB_API_KEY)
             .withClientName(CLIENT_WEB_NAME)
             .withClientField("clientVersion", CLIENT_WEB_VERSION);
 
-    public static YoutubeClientConfig MUSIC = new YoutubeClientConfig()
+    public static final YoutubeClientConfig MUSIC = new YoutubeClientConfig()
             .withApiKey(INNERTUBE_MUSIC_API_KEY) // Requires header (Referer music.youtube.com)
             .withClientName(CLIENT_MUSIC_NAME)
             .withClientField("clientVersion", CLIENT_MUSIC_VERSION);
@@ -151,14 +151,14 @@ public class YoutubeClientConfig extends JSONObject {
 
     public enum AndroidVersion {
         // https://apilevels.com/
-        ANDROID_11("11", 30);
+        ANDROID_11();
 
         private final String osVersion;
         private final int sdkVersion;
 
-        AndroidVersion(String osVersion, int sdkVersion) {
-            this.osVersion = osVersion;
-            this.sdkVersion = sdkVersion;
+        AndroidVersion() {
+            this.osVersion = "11";
+            this.sdkVersion = 30;
         }
 
         public String getOsVersion() {

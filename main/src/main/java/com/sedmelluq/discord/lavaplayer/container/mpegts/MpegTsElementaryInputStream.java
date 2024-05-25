@@ -2,7 +2,6 @@ package com.sedmelluq.discord.lavaplayer.container.mpegts;
 
 import com.sedmelluq.discord.lavaplayer.tools.io.BitBufferReader;
 import com.sedmelluq.discord.lavaplayer.tools.io.GreedyInputStream;
-import com.sedmelluq.discord.lavaplayer.track.info.AudioTrackInfoBuilder;
 import com.sedmelluq.discord.lavaplayer.track.info.AudioTrackInfoProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -205,7 +204,7 @@ public class MpegTsElementaryInputStream extends InputStream {
       byte[] textBytes = new byte[length];
       packetBuffer.get(textBytes);
 
-      return new String(textBytes, 0, textBytes.length, StandardCharsets.US_ASCII);
+      return new String(textBytes, StandardCharsets.US_ASCII);
     } else {
       return null;
     }

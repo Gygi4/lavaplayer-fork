@@ -43,18 +43,18 @@ public class AacDecoder extends NativeResourceHolder {
   /**
    * Configure the decoder. Must be called before the first decoding.
    *
-   * @param objectType Audio object type as defined for Audio Specific Config: https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio
-   * @param frequency Frequency of samples in Hz
-   * @param channels Number of channels.
+   * @param objectType Audio object type as defined for Audio Specific Config: <a href="https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio">...</a>
+   * @param frequency  Frequency of samples in Hz
+   * @param channels   Number of channels.
    * @throws IllegalStateException If the decoder has already been closed.
    */
-  public int configure(int objectType, int frequency, int channels) {
+  public void configure(int objectType, int frequency, int channels) {
     int extensionFrequency = isSbrOrPs(objectType) ? frequency * 2 : frequency;
     int extensionProfile = isSbrOrPs(objectType) ? AAC_LC : objectType;
 
     byte[] buffer = encodeConfiguration(objectType, frequency, channels, extensionFrequency, extensionProfile);
 
-    return configure(buffer);
+    configure(buffer);
   }
 
   /**
@@ -63,27 +63,19 @@ public class AacDecoder extends NativeResourceHolder {
    * @param config Raw ASC format configuration
    * @throws IllegalStateException If the decoder has already been closed.
    */
-  public int configure(byte[] config) {
+  public void configure(byte[] config) {
     checkNotReleased();
 
     if (config.length > 8) {
       throw new IllegalArgumentException("Cannot process a header larger than size 8");
     }
 
-    return library.configure(instance, config);
+    library.configure(instance, config);
   }
 
   private static boolean isSbrOrPs(int objectType) {
     return objectType == SBR || objectType == PS;
   }
-
-//  private synchronized int configureRaw(long buffer) {
-//    if (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN) {
-//      buffer = Long.reverseBytes(buffer);
-//    }
-//
-//    return library.configure(instance, buffer);
-//  }
 
   private static byte[] encodeConfiguration(int objectType,
                                             int frequency,
@@ -138,16 +130,14 @@ public class AacDecoder extends NativeResourceHolder {
   }
 
   /**
-   * Fill the internal decoding buffer with the bytes from the buffer. May consume less bytes than the buffer provides.
+   * Fill the internal decoding buffer with the bytes from the buffer. May consume fewer bytes than the buffer provides.
    *
    * @param buffer DirectBuffer which contains the bytes to be added. Position and limit are respected and position is
    *               updated as a result of this operation.
-   * @return The number of bytes consumed from the provided buffer.
-   *
    * @throws IllegalArgumentException If the buffer is not a DirectBuffer.
-   * @throws IllegalStateException If the decoder has already been closed.
+   * @throws IllegalStateException    If the decoder has already been closed.
    */
-  public synchronized int fill(ByteBuffer buffer) {
+  public synchronized void fill(ByteBuffer buffer) {
     checkNotReleased();
 
     if (!buffer.isDirect()) {
@@ -160,7 +150,6 @@ public class AacDecoder extends NativeResourceHolder {
     }
 
     buffer.position(buffer.position() + readBytes);
-    return readBytes;
   }
 
   /**

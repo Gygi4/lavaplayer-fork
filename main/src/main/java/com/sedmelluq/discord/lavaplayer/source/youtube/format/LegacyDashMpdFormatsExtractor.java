@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
@@ -66,7 +68,7 @@ public class LegacyDashMpdFormatsExtractor implements YoutubeTrackFormatExtracto
       String mimeType = adaptation.attr("mimeType");
 
       for (Element representation : adaptation.select("Representation")) {
-        String url = representation.select("BaseURL").first().text();
+        String url = Objects.requireNonNull(representation.select("BaseURL").first()).text();
         String contentLength = DataFormatTools.extractBetween(url, "/clen/", "/");
         String contentType = mimeType + "; codecs=" + representation.attr("codecs");
 

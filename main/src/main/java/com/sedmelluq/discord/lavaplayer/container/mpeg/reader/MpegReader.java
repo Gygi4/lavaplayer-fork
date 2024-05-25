@@ -103,10 +103,10 @@ public class MpegReader {
 
   /**
    * Read a null-terminated UTF string.
-   * @return The string read from the stream
+   *
    * @throws IOException On read error
    */
-  public String readTerminatedString() throws IOException {
+  public void readTerminatedString() throws IOException {
     ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     byte nextByte;
 
@@ -114,7 +114,7 @@ public class MpegReader {
       bytes.write(nextByte);
     }
 
-    return new String(bytes.toByteArray(), StandardCharsets.UTF_8);
+    bytes.toByteArray();
   }
 
   public int readCompressedInt() throws IOException {
@@ -263,7 +263,7 @@ public class MpegReader {
       }
     }
 
-    private boolean handleSection(MpegSectionInfo child, Handler handler) throws IOException {
+    private void handleSection(MpegSectionInfo child, Handler handler) throws IOException {
       if (handler.sectionHandler instanceof MpegVersionedSectionHandler) {
         MpegVersionedSectionInfo versioned = parseFlagsForSection(reader.data, child);
         ((MpegVersionedSectionHandler) handler.sectionHandler).handle(versioned);
@@ -271,18 +271,15 @@ public class MpegReader {
         ((MpegSectionHandler) handler.sectionHandler).handle(child);
       }
 
-      return !handler.terminator;
     }
   }
 
   private static class Handler {
     private final String type;
-    private final boolean terminator;
     private final Object sectionHandler;
 
     private Handler(String type, boolean terminator, Object sectionHandler) {
       this.type = type;
-      this.terminator = terminator;
       this.sectionHandler = sectionHandler;
     }
   }

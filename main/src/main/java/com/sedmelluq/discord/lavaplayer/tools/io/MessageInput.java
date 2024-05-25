@@ -54,7 +54,7 @@ public class MessageInput {
 
   /**
    * Skip the remaining bytes of the last message returned from nextMessage(). This must be called if it is not certain
-   * that all of the bytes of the message were consumed.
+   * that all the bytes of the message were consumed.
    * @throws IOException On IO error
    */
   public void skipRemainingBytes() throws IOException {

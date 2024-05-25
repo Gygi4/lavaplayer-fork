@@ -29,13 +29,6 @@ public class ThumbnailTools {
     }
 
     public static String getSoundCloudThumbnail(JsonBrowser trackData) {
-        JsonBrowser thumbnail = trackData.get("artwork_url");
-
-        if (!thumbnail.isNull()) {
-            return thumbnail.text().replace("large.jpg", "original.jpg");
-        }
-
-        JsonBrowser avatar = trackData.get("user").get("avatar_url");
-        return avatar.text().replace("large.jpg", "original.jpg");
+      return PBJUtils.getSoundCloudThumbnail(trackData);
     }
 }

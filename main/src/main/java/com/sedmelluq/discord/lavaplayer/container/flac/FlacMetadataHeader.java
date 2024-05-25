@@ -20,7 +20,7 @@ public class FlacMetadataHeader {
   public final boolean isLastBlock;
 
   /**
-   * Block type, see: https://xiph.org/flac/format.html#metadata_block_header
+   * Block type, see: <a href="https://xiph.org/flac/format.html#metadata_block_header">...</a>
    */
   public final int blockType;
 

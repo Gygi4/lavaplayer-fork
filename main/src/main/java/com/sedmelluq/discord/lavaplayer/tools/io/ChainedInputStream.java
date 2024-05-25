@@ -94,19 +94,13 @@ public class ChainedInputStream extends InputStream {
     }
   }
 
-  @Override
-  public boolean markSupported() {
-    return false;
-  }
-
   /**
    * Provider for next input stream of a chained stream.
    */
   public interface Provider {
     /**
      * @return Next input stream, null to cause EOF on the chained stream.
-     * @throws IOException On read error.
      */
-    InputStream next() throws IOException;
+    InputStream next();
   }
 }

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -65,7 +64,7 @@ public class AllocatingAudioFrameBuffer extends AbstractAudioFrameBuffer {
   }
 
   @Override
-  public AudioFrame provide(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException {
+  public AudioFrame provide(long timeout, TimeUnit unit) throws InterruptedException {
     AudioFrame frame = audioFrames.poll();
 
     if (frame == null) {
@@ -97,7 +96,7 @@ public class AllocatingAudioFrameBuffer extends AbstractAudioFrameBuffer {
 
   @Override
   public boolean provide(MutableAudioFrame targetFrame, long timeout, TimeUnit unit)
-      throws TimeoutException, InterruptedException {
+      throws InterruptedException {
 
     return passToMutable(provide(timeout, unit), targetFrame);
   }

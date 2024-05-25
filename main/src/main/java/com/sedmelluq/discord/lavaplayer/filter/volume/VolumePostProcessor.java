@@ -21,7 +21,7 @@ public class VolumePostProcessor implements AudioPostProcessor {
   }
 
   @Override
-  public void process(long timecode, ShortBuffer buffer) throws InterruptedException {
+  public void process(long timecode, ShortBuffer buffer) {
     int currentVolume = context.playerOptions.volumeLevel.get();
 
     if (currentVolume != volumeProcessor.getLastVolume()) {

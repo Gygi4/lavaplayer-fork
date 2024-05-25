@@ -85,8 +85,8 @@ public class VimeoAudioTrack extends DelegatedAudioTrack {
   }
 
   private static class PlaybackSource {
-    public String url;
-    public boolean isHls;
+    public final String url;
+    public final boolean isHls;
 
     public PlaybackSource(String url, boolean isHls) {
       this.url = url;

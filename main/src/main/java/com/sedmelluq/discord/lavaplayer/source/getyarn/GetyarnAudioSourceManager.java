@@ -17,6 +17,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -111,8 +112,8 @@ public class GetyarnAudioSourceManager implements HttpConfigurable, AudioSourceM
           .setUri(reference.identifier)
           .setAuthor("Unknown")
           .setIsStream(false)
-          .setIdentifier(document.selectFirst("meta[property=og:video:secure_url]").attr("content"))
-          .setTitle(document.selectFirst("meta[property=og:title]").attr("content"))
+          .setIdentifier(Objects.requireNonNull(document.selectFirst("meta[property=og:video:secure_url]")).attr("content"))
+          .setTitle(Objects.requireNonNull(document.selectFirst("meta[property=og:title]")).attr("content"))
           .build();
 
       return createTrack(trackInfo);

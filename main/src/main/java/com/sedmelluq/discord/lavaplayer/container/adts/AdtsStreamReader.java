@@ -91,7 +91,7 @@ public class AdtsStreamReader {
       }
 
       if (bufferPosition == scanBuffer.length) {
-        copyEndToBeginning(scanBuffer, HEADER_BASE_SIZE);
+        copyEndToBeginning(scanBuffer);
         bufferPosition = HEADER_BASE_SIZE;
       }
     }
@@ -119,9 +119,9 @@ public class AdtsStreamReader {
     return header;
   }
 
-  private static void copyEndToBeginning(byte[] buffer, int chunk) {
-    for (int i = 0; i < chunk; i++) {
-      buffer[i] = buffer[buffer.length - chunk + i];
+  private static void copyEndToBeginning(byte[] buffer) {
+    for (int i = 0; i < AdtsStreamReader.HEADER_BASE_SIZE; i++) {
+      buffer[i] = buffer[buffer.length - AdtsStreamReader.HEADER_BASE_SIZE + i];
     }
   }
 

@@ -80,7 +80,7 @@ public class FlacFrameHeaderReader {
       blockSize = bitStreamReader.asInteger(16) + 1;
     }
 
-    verifyNotInvalid(blockSize, "block size");
+    verifyNotInvalid(blockSize);
 
     if (blockSize == SAMPLE_RATE_EXPLICIT_8_BIT) {
       sampleRate = bitStreamReader.asInteger(8);
@@ -100,9 +100,9 @@ public class FlacFrameHeaderReader {
     return new FlacFrameInfo(blockSize, channelDelta);
   }
 
-  private static void verifyNotInvalid(int value, String description) {
+  private static void verifyNotInvalid(int value) {
     if (value < 0) {
-      throw new IllegalStateException("Invalid value " + value + " for " + description);
+      throw new IllegalStateException("Invalid value " + value + " for " + "block size");
     }
   }
 
@@ -112,7 +112,7 @@ public class FlacFrameHeaderReader {
     }
   }
 
-  private static long readUtf8Value(boolean isLong, BitStreamReader bitStreamReader) throws IOException {
+  private static void readUtf8Value(boolean isLong, BitStreamReader bitStreamReader) throws IOException {
     int maximumSize = isLong ? 7 : 6;
     int firstByte = bitStreamReader.asInteger(8);
     int leadingOnes = Integer.numberOfLeadingZeros((~firstByte) & 0xFF) - 24;
@@ -120,7 +120,7 @@ public class FlacFrameHeaderReader {
     if (leadingOnes > maximumSize || leadingOnes == 1) {
       throw new IllegalStateException("Invalid number of leading ones in UTF encoded integer");
     } else if (leadingOnes == 0) {
-      return firstByte;
+      return;
     }
 
     long value = firstByte - (1L << (7 - leadingOnes)) - 1L;
@@ -133,7 +133,5 @@ public class FlacFrameHeaderReader {
 
       value = (value << 6) | (currentByte & 0x3F);
     }
-
-    return value;
   }
 }

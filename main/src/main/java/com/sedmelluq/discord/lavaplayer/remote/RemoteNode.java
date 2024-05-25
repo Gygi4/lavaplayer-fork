@@ -61,7 +61,7 @@ public interface RemoteNode {
   Map<String, Integer> getBalancerPenaltyDetails();
 
   /**
-   * Checks if a audio track is being played by this node.
+   * Checks if an audio track is being played by this node.
    *
    * @param track The audio track.
    * @return True if this node is playing that track.

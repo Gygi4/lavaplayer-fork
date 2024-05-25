@@ -32,7 +32,6 @@ public class MpegTrackInfo {
    * @param codecName Name of the codec
    * @param channelCount Number of audio channels
    * @param sampleRate Sample rate for audio
-   * @param decoderConfig
    */
   public MpegTrackInfo(int trackId, String handler, String codecName, int channelCount, int sampleRate, byte[] decoderConfig) {
     this.trackId = trackId;

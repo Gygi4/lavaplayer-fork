@@ -120,12 +120,12 @@ public class TwitchStreamAudioSourceManager implements AudioSourceManager, HttpC
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
+  public void encodeTrack(AudioTrack track, DataOutput output) {
     // Nothing special to do, URL (identifier) is enough
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
     return new TwitchStreamAudioTrack(trackInfo, this);
   }
 

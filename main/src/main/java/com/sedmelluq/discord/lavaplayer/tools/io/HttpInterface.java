@@ -28,7 +28,6 @@ public class HttpInterface implements Closeable {
    * @param client The http client instance used.
    * @param context The http context instance used.
    * @param ownedClient True if the client should be closed when this instance is closed.
-   * @param filter
    */
   public HttpInterface(CloseableHttpClient client, HttpClientContext context, boolean ownedClient,
                        HttpContextFilter filter) {
@@ -84,8 +83,6 @@ public class HttpInterface implements Closeable {
           } else //noinspection ConstantConditions
             if (e instanceof IOException) {
             throw (IOException) e;
-          } else {
-            throw new RuntimeException(e);
           }
         } else {
           ExceptionTools.rethrowErrors(e);

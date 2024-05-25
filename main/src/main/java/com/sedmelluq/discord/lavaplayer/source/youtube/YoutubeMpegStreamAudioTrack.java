@@ -174,7 +174,7 @@ public class YoutubeMpegStreamAudioTrack extends MpegAudioTrack {
         return false;
       }
 
-      // If we were redirected, use that URL as a base for the next segment URL. Otherwise we will likely get redirected
+      // If we were redirected, use that URL as a base for the next segment URL. Otherwise, we will likely get redirected
       // again on every other request, which is inefficient (redirects across domains, the original URL is always
       // closing the connection, whereas the final URL is keep-alive).
       state.redirectUrl = httpInterface.getFinalLocation();

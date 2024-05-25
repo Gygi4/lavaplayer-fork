@@ -87,7 +87,7 @@ public enum MatroskaElementType {
   }
 
   /**
-   * Data type of an element.
+   * Data type of element.
    */
   public enum DataType {
     /**

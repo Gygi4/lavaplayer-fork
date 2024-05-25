@@ -81,7 +81,7 @@ public class MediaContainerDetectionResult {
   }
 
   /**
-   * @return Whether this specific file is supported. If this returns true, the track info is non-null. Otherwise
+   * @return Whether this specific file is supported. If this returns true, the track info is non-null. Otherwise,
    *         the reason why this file is not supported can be retrieved via getUnsupportedReason().
    */
   public boolean isSupportedFile() {

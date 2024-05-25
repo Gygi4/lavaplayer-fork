@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeConstants.ANDROID_AUTH_URL;
 import static com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeConstants.CHECKIN_ACCOUNT_URL;
 import static com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeConstants.LOGIN_ACCOUNT_URL;
 import static com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeConstants.SAVE_ACCOUNT_URL;
@@ -315,7 +314,7 @@ public class YoutubeAccessTokenTracker {
       params.add(new BasicNameValuePair("google_play_services_version", "214516005"));
       params.add(new BasicNameValuePair("service", "oauth2:https://www.googleapis.com/auth/youtube"));
       params.add(new BasicNameValuePair("Token", masterToken));
-      HttpPost post = new HttpPost(buildUri(ANDROID_AUTH_URL, params));
+      HttpPost post = new HttpPost(buildUri(params));
 
       try (CloseableHttpResponse response = httpInterface.execute(post)) {
         HttpClientTools.assertSuccessWithContent(response, "access token android response");
@@ -328,7 +327,7 @@ public class YoutubeAccessTokenTracker {
   }
 
   private void createAndroidAccount(HttpInterface httpInterface, JsonBrowser jsonBrowser) throws IOException {
-    log.info("Account " + jsonBrowser.get("email").text() + " don't have Android or YouTube profile, creating new one...");
+    log.info("Account {} don't have Android or YouTube profile, creating new one...", jsonBrowser.get("email").text());
 
     HttpPost post = new HttpPost(CHECKIN_ACCOUNT_URL);
     StringEntity payload = new StringEntity(String.format(TOKEN_PAYLOAD, email, password));
@@ -340,7 +339,7 @@ public class YoutubeAccessTokenTracker {
   }
 
   private String continueUrl(HttpInterface httpInterface, JsonBrowser jsonBrowser) throws IOException {
-    log.warn("Not successful attempt to login into account " + jsonBrowser.get("email").text() + ", trying obtain oauth2 token through continue url...");
+    log.warn("Not successful attempt to login into account {}, trying obtain oauth2 token through continue url...", jsonBrowser.get("email").text());
 
     HttpPost post = new HttpPost(jsonBrowser.get("continueUrl").text());
     RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).setRedirectsEnabled(true).build();
@@ -365,7 +364,7 @@ public class YoutubeAccessTokenTracker {
         params.add(new BasicNameValuePair("Token", oauthToken));
         params.add(new BasicNameValuePair("ACCESS_TOKEN", "1"));
         params.add(new BasicNameValuePair("service", "ac2dm"));
-        HttpPost post = new HttpPost(buildUri(ANDROID_AUTH_URL, params));
+        HttpPost post = new HttpPost(buildUri(params));
 
         try (CloseableHttpResponse exchangeResponse = httpInterface.execute(post)) {
           HttpClientTools.assertSuccessWithContent(exchangeResponse, "exchange oauth2 token response");
@@ -493,9 +492,9 @@ public class YoutubeAccessTokenTracker {
     }
   }
 
-  private URI buildUri(String url, List<NameValuePair> params) {
+  private URI buildUri(List<NameValuePair> params) {
     try {
-      return new URIBuilder(url)
+      return new URIBuilder(YoutubeConstants.ANDROID_AUTH_URL)
               .addParameters(params)
               .build();
     } catch (URISyntaxException e) {

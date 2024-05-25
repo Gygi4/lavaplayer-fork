@@ -30,7 +30,6 @@ public class OpusPacketRouter {
   private final byte[] headerBytes;
   private final MutableAudioFrame offeredFrame;
 
-  private long currentFrameDuration;
   private long currentTimecode;
   private long requestedTimecode;
   private OpusDecoder opusDecoder;
@@ -74,9 +73,8 @@ public class OpusPacketRouter {
 
   /**
    * Indicates that no more input is coming. Flush any buffers to output.
-   * @throws InterruptedException When interrupted externally (or for seek/stop).
    */
-  public void flush() throws InterruptedException {
+  public void flush() {
     if (downstream != null) {
       downstream.flush();
     }
@@ -128,7 +126,7 @@ public class OpusPacketRouter {
       inputFormat = new OpusAudioDataFormat(inputChannels, inputFrequency, frameSize);
     }
 
-    currentFrameDuration = frameSize * 1000 / inputFrequency;
+    long currentFrameDuration = frameSize * 1000L / inputFrequency;
     currentTimecode += currentFrameDuration;
     return frameSize;
   }

@@ -82,7 +82,7 @@ public class MatroskaEbmlReader {
   }
 
   private static long applyNextByte(int codeLength, int value, int index) {
-    return value << ((codeLength - index) << 3);
+    return (long) value << ((codeLength - index) << 3);
   }
 
   private static long applyType(long code, int codeLength, Type type) {
@@ -144,7 +144,7 @@ public class MatroskaEbmlReader {
      */
     SIGNED,
     /**
-     * Signed value where where sign is applied via subtraction.
+     * Signed value where sign is applied via subtraction.
      */
     LACE_SIGNED,
     /**

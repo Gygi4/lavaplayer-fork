@@ -111,7 +111,7 @@ public class MatroskaVorbisTrackConsumer implements MatroskaTrackConsumer {
   }
 
   @Override
-  public void flush() throws InterruptedException {
+  public void flush() {
     downstream.flush();
   }
 

@@ -279,7 +279,7 @@ public class ExtendedConnectionOperator implements HttpClientConnectionOperator 
     if (field == null) {
       builder.append("<unspecified>");
     } else {
-      builder.append(field.toString());
+      builder.append(field);
     }
   }
 

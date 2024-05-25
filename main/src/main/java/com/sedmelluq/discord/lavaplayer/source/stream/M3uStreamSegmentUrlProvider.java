@@ -30,7 +30,7 @@ public abstract class M3uStreamSegmentUrlProvider {
   private static final long SEGMENT_WAIT_STEP_MS = 200;
   private static final RequestConfig streamingRequestConfig = RequestConfig.custom().setSocketTimeout(5000).setConnectionRequestTimeout(5000).setConnectTimeout(5000).build();
 
-  protected String baseUrl;
+  protected final String baseUrl;
   protected SegmentInfo lastSegment;
 
   protected M3uStreamSegmentUrlProvider() {

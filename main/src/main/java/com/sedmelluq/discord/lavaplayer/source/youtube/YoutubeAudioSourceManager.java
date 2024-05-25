@@ -35,7 +35,7 @@ import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS;
 
 /**
- * Audio source manager that implements finding Youtube videos or playlists based on an URL or ID.
+ * Audio source manager that implements finding YouTube videos or playlists based on a URL or ID.
  */
 public class YoutubeAudioSourceManager implements AudioSourceManager, HttpConfigurable {
   private static final Logger log = LoggerFactory.getLogger(YoutubeAudioSourceManager.class);
@@ -304,7 +304,7 @@ public class YoutubeAudioSourceManager implements AudioSourceManager, HttpConfig
         try (CloseableHttpResponse response = httpInterface.execute(new HttpGet("https://www.youtube.com/watch_videos?video_ids=" + videoIds))) {
           HttpClientTools.assertSuccessWithContent(response, "playlist response");
           HttpClientContext context = httpInterface.getContext();
-          // youtube currently transforms watch_video links into a link with a video id and a list id.
+          // YouTube currently transforms watch_video links into a link with a video id and a list id.
           // because that's what happens, we can simply re-process with the redirected link
           List<URI> redirects = context.getRedirectLocations();
           if (redirects != null && !redirects.isEmpty()) {

@@ -8,7 +8,6 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.sedmelluq.discord.lavaplayer.container.MediaContainerDetection.checkNextBytes;
@@ -395,11 +394,9 @@ public class OggPacketInputStream extends InputStream {
     // Load more segments for this packet from the next page.
     if (!loadNextNonEmptyPage()) {
       throw new IllegalStateException("Track or stream end reached within an incomplete packet.");
-    } else if (!initialisePacket()) {
-      return false;
     }
 
-    return true;
+    return initialisePacket();
   }
 
   private enum State {

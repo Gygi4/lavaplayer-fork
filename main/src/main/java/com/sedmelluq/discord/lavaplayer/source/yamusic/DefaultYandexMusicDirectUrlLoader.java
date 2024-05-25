@@ -5,7 +5,6 @@ import com.sedmelluq.discord.lavaplayer.tools.ExceptionTools;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.tools.JsonBrowser;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
-import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterfaceManager;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -42,7 +41,7 @@ public class DefaultYandexMusicDirectUrlLoader extends AbstractYandexMusicApiLoa
     });
   }
 
-  private DownloadInfo extractDownloadInfo(String storageUrl) throws IOException {
+  private DownloadInfo extractDownloadInfo(String storageUrl) {
     try (HttpInterface httpInterface = httpInterfaceManager.getInterface()) {
       String responseText;
       try (CloseableHttpResponse response = httpInterface.execute(new HttpGet(storageUrl))) {
@@ -64,7 +63,7 @@ public class DefaultYandexMusicDirectUrlLoader extends AbstractYandexMusicApiLoa
     }
   }
 
-  private class DownloadInfo {
+  private static class DownloadInfo {
     String host;
     String path;
     String ts;

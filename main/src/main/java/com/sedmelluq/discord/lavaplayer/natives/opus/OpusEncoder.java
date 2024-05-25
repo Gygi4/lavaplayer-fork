@@ -31,12 +31,12 @@ public class OpusEncoder extends NativeResourceHolder {
 
   /**
    * Encode the input buffer to output.
-   * @param directInput Input sample buffer
-   * @param frameSize Number of samples per channel
+   *
+   * @param directInput  Input sample buffer
+   * @param frameSize    Number of samples per channel
    * @param directOutput Output byte buffer
-   * @return Number of bytes written to the output
    */
-  public int encode(ShortBuffer directInput, int frameSize, ByteBuffer directOutput) {
+  public void encode(ShortBuffer directInput, int frameSize, ByteBuffer directOutput) {
     checkNotReleased();
 
     if (!directInput.isDirect() || !directOutput.isDirect()) {
@@ -53,7 +53,6 @@ public class OpusEncoder extends NativeResourceHolder {
     directOutput.position(result);
     directOutput.flip();
 
-    return result;
   }
 
   @Override

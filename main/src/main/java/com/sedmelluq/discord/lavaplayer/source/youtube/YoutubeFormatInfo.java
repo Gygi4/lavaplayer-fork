@@ -5,7 +5,7 @@ import org.apache.http.entity.ContentType;
 import static com.sedmelluq.discord.lavaplayer.container.Formats.*;
 
 /**
- * The mime type and codec info of a Youtube track format.
+ * The mime type and codec info of a YouTube track format.
  */
 public enum YoutubeFormatInfo {
   WEBM_OPUS(MIME_AUDIO_WEBM, CODEC_OPUS),

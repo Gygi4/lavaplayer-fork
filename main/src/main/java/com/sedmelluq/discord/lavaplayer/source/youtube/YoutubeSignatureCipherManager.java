@@ -47,16 +47,14 @@ public class YoutubeSignatureCipherManager implements YoutubeSignatureResolver {
   private static final String SWAP_PART = ":function\\(a,b\\)\\{" +
           "var c=a\\[0\\];a\\[0\\]=a\\[b%a\\.length\\];a\\[b(?:%a.length|)\\]=c(?:;return a)?\\}";
 
-  private static final Pattern functionPattern = Pattern.compile("" +
-          "function(?: " + VARIABLE_PART + ")?\\(a\\)\\{" +
+  private static final Pattern functionPattern = Pattern.compile("function(?: " + VARIABLE_PART + ")?\\(a\\)\\{" +
           "a=a\\.split\\(\"\"\\);\\s*" +
           "((?:(?:a=)?" + VARIABLE_PART + VARIABLE_PART_ACCESS + "\\(a,\\d+\\);)+)" +
           "return a\\.join\\(\"\"\\)" +
           "\\}"
   );
 
-  private static final Pattern actionsPattern = Pattern.compile("" +
-          "var (" + VARIABLE_PART + ")=\\{((?:(?:" +
+  private static final Pattern actionsPattern = Pattern.compile("var (" + VARIABLE_PART + ")=\\{((?:(?:" +
           VARIABLE_PART_DEFINE + REVERSE_PART + "|" +
           VARIABLE_PART_DEFINE + SLICE_PART + "|" +
           VARIABLE_PART_DEFINE + SPLICE_PART + "|" +

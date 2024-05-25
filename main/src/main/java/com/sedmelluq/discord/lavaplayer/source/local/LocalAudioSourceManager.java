@@ -60,8 +60,6 @@ public class LocalAudioSourceManager extends ProbingAudioSourceManager {
 
       return new MediaContainerDetection(containerRegistry, reference, inputStream,
           MediaContainerHints.from(null, fileExtension)).detectContainer();
-    } catch (IOException e) {
-      throw new FriendlyException("Failed to open file for reading.", SUSPICIOUS, e);
     }
   }
 

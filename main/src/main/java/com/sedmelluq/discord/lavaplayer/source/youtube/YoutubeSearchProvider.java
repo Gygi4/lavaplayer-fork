@@ -16,7 +16,6 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -76,11 +75,7 @@ public class YoutubeSearchProvider implements YoutubeSearchResultLoader {
                                          Function<AudioTrackInfo, AudioTrack> trackFactory) {
     List<AudioTrack> tracks;
     log.debug("Attempting to parse results from search page");
-    try {
-      tracks = extractSearchPage(jsonBrowser, trackFactory);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    tracks = extractSearchPage(jsonBrowser, trackFactory);
 
     if (tracks.isEmpty()) {
       return AudioReference.NO_TRACK;
@@ -89,7 +84,7 @@ public class YoutubeSearchProvider implements YoutubeSearchResultLoader {
     }
   }
 
-  private List<AudioTrack> extractSearchPage(JsonBrowser jsonBrowser, Function<AudioTrackInfo, AudioTrack> trackFactory) throws IOException {
+  private List<AudioTrack> extractSearchPage(JsonBrowser jsonBrowser, Function<AudioTrackInfo, AudioTrack> trackFactory) {
     ArrayList<AudioTrack> list = new ArrayList<>();
     jsonBrowser.get("contents")
             .get("sectionListRenderer")

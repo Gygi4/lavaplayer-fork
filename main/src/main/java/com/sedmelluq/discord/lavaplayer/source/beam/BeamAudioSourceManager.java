@@ -20,7 +20,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -88,12 +87,12 @@ public class BeamAudioSourceManager implements AudioSourceManager, HttpConfigura
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
+  public void encodeTrack(AudioTrack track, DataOutput output) {
     // Nothing special to do, URL (identifier) is enough
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
     return new BeamAudioTrack(trackInfo, this);
   }
 
@@ -104,7 +103,7 @@ public class BeamAudioSourceManager implements AudioSourceManager, HttpConfigura
 
   private static String getPlayedStreamId(JsonBrowser channelInfo) {
     // If there is a hostee, this means that the current channel itself is not actually broadcasting anything and all
-    // further requests should be performed with the ID of the hostee. Hostee is not rechecked later so it will keep
+    // further requests should be performed with the ID of the hostee. Hostee is not rechecked later, so it will keep
     // playing the current hostee even if it changes.
     String hosteeId = channelInfo.get("hosteeId").text();
     return hosteeId != null ? hosteeId : channelInfo.get("id").text();

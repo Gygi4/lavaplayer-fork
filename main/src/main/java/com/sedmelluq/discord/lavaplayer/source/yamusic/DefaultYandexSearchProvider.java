@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.tools.JsonBrowser;
 import com.sedmelluq.discord.lavaplayer.track.*;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +36,7 @@ public class DefaultYandexSearchProvider extends AbstractYandexMusicApiLoader im
     int limit = getValidLimit(matcher.group(4));
     String text = matcher.group(5);
     try {
-      return extractFromApi(String.format(TRACKS_INFO_FORMAT, type, URLEncoder.encode(text, "UTF-8")), (httpClient, result) -> {
+      return extractFromApi(String.format(TRACKS_INFO_FORMAT, type, URLEncoder.encode(text, StandardCharsets.UTF_8)), (httpClient, result) -> {
         if ("track".equalsIgnoreCase(type)) {
           return loadTracks(getResults(result, "tracks"), limit, trackFactory);
         }

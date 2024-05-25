@@ -164,10 +164,7 @@ public class ExceptionTools {
         message = cause.getMessage();
       }
 
-      output.writeBoolean(message != null);
-      if (message != null) {
-        output.writeUTF(message);
-      }
+      DataFormatTools.writeNullableText(output, message);
 
       encodeStackTrace(output, cause);
     }
@@ -202,10 +199,7 @@ public class ExceptionTools {
       output.writeUTF(element.getMethodName());
 
       String fileName = element.getFileName();
-      output.writeBoolean(fileName != null);
-      if (fileName != null) {
-        output.writeUTF(fileName);
-      }
+      DataFormatTools.writeNullableText(output, fileName);
       output.writeInt(element.getLineNumber());
     }
   }

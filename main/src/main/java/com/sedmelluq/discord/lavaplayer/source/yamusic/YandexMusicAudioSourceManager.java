@@ -18,7 +18,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -139,12 +138,12 @@ public class YandexMusicAudioSourceManager implements AudioSourceManager, HttpCo
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
+  public void encodeTrack(AudioTrack track, DataOutput output) {
     // No special values to encode
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
     return new YandexMusicAudioTrack(trackInfo, this);
   }
 

@@ -374,14 +374,6 @@ public class Mp3TrackProvider implements AudioTrackInfoProvider {
   private static class FrameHeader {
     private final String id;
     private final int size;
-    @SuppressWarnings("unused")
-    private final boolean tagAlterPreservation;
-    @SuppressWarnings("unused")
-    private final boolean fileAlterPreservation;
-    @SuppressWarnings("unused")
-    private final boolean readOnly;
-    @SuppressWarnings("unused")
-    private final boolean groupingIdentity;
     private final boolean compression;
     private final boolean encryption;
     private final boolean unsynchronization;
@@ -390,10 +382,10 @@ public class Mp3TrackProvider implements AudioTrackInfoProvider {
     private FrameHeader(String id, int size, int flags) {
       this.id = id;
       this.size = size;
-      this.tagAlterPreservation = (flags & 0x4000) != 0;
-      this.fileAlterPreservation = (flags & 0x2000) != 0;
-      this.readOnly = (flags & 0x1000) != 0;
-      this.groupingIdentity = (flags & 0x0040) != 0;
+      boolean tagAlterPreservation = (flags & 0x4000) != 0;
+      boolean fileAlterPreservation = (flags & 0x2000) != 0;
+      boolean readOnly = (flags & 0x1000) != 0;
+      boolean groupingIdentity = (flags & 0x0040) != 0;
       this.compression = (flags & 0x0008) != 0;
       this.encryption = (flags & 0x0004) != 0;
       this.unsynchronization = (flags & 0x0002) != 0;

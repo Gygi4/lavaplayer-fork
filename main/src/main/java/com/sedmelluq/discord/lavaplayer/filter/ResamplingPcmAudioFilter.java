@@ -44,7 +44,7 @@ public class ResamplingPcmAudioFilter implements FloatPcmAudioFilter {
   }
 
   @Override
-  public void flush() throws InterruptedException {
+  public void flush() {
     // Nothing to do.
   }
 

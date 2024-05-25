@@ -30,6 +30,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -102,10 +103,10 @@ public class NicoAudioSourceManager implements AudioSourceManager, HttpConfigura
 
   private AudioTrack extractTrackFromXml(String videoId, Document document) {
     for (Element element : document.select(":root > thumb")) {
-      String uploader = element.selectFirst("user_nickname").text();
-      String title = element.selectFirst("title").text();
-      String thumbnailUrl = element.selectFirst("thumbnail_url").text();
-      long duration = DataFormatTools.durationTextToMillis(element.selectFirst("length").text());
+      String uploader = Objects.requireNonNull(element.selectFirst("user_nickname")).text();
+      String title = Objects.requireNonNull(element.selectFirst("title")).text();
+      String thumbnailUrl = Objects.requireNonNull(element.selectFirst("thumbnail_url")).text();
+      long duration = DataFormatTools.durationTextToMillis(Objects.requireNonNull(element.selectFirst("length")).text());
 
       return new NicoAudioTrack(new AudioTrackInfo(title,
           uploader,
@@ -127,12 +128,12 @@ public class NicoAudioSourceManager implements AudioSourceManager, HttpConfigura
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
+  public void encodeTrack(AudioTrack track, DataOutput output) {
     // No extra information to save
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
     return new NicoAudioTrack(trackInfo, this);
   }
 

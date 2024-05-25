@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Message from an audio node to the master as a response to TrackFrameRequestMessage. Bouncing back the seeked position
- * is necessary because then the master can clear up the pending seek only if it matches this number. Otherwise the seek
+ * is necessary because then the master can clear up the pending seek only if it matches this number. Otherwise, the seek
  * position has been changed while the data for the previous seek was requested. The master also cannot clear the seek
  * state when sending the request, because in case the request fails, the seek will be discarded.
  */
