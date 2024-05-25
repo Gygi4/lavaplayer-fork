@@ -100,7 +100,7 @@ public class PesPacketInputStream extends InputStream {
   }
 
   @Override
-  public int available() {
+  public int available() throws IOException {
     return packetBytesLeft;
   }
 }

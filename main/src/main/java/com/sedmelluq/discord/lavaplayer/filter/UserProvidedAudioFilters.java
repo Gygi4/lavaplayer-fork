@@ -83,7 +83,7 @@ public class UserProvidedAudioFilters extends CompositeAudioFilter {
     chain.input.process(input, offset, length);
   }
 
-  private void checkRebuild() {
+  private void checkRebuild() throws InterruptedException {
     if (hotSwapEnabled && context.playerOptions.filterFactory.get() != chain.context) {
       flush();
       close();

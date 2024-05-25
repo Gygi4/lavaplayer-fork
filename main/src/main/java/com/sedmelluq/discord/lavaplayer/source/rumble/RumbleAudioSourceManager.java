@@ -138,12 +138,12 @@ public class RumbleAudioSourceManager implements AudioSourceManager, HttpConfigu
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) {
+  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
     // nothing to encode
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
     return new RumbleAudioTrack(trackInfo, this);
   }
 

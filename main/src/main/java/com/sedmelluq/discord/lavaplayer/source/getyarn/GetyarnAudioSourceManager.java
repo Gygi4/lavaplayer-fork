@@ -75,12 +75,12 @@ public class GetyarnAudioSourceManager implements HttpConfigurable, AudioSourceM
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) {
+  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
     // No custom values that need saving
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
     return new GetyarnAudioTrack(trackInfo, this);
   }
 

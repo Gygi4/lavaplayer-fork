@@ -62,12 +62,12 @@ public class AudioPlayerInputStream extends InputStream {
   }
 
   @Override
-  public int available() {
+  public int available() throws IOException {
     return current != null ? current.remaining() : 0;
   }
 
   @Override
-  public void close() {
+  public void close() throws IOException {
     player.stopTrack();
   }
 

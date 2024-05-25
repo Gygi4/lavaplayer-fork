@@ -17,6 +17,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -161,12 +162,12 @@ public class YoutubeAudioSourceManager implements AudioSourceManager, HttpConfig
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) {
+  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
     // No custom values that need saving
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
     return new YoutubeAudioTrack(trackInfo, this);
   }
 

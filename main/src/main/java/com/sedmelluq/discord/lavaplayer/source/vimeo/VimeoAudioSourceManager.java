@@ -71,12 +71,12 @@ public class VimeoAudioSourceManager implements AudioSourceManager, HttpConfigur
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) {
+  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
     // Nothing special to encode
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
     return new VimeoAudioTrack(trackInfo, this);
   }
 

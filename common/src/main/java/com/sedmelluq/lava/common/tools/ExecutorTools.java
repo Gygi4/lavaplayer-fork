@@ -109,12 +109,12 @@ public class ExecutorTools {
         }
 
         @Override
-        public Void get() {
+        public Void get() throws InterruptedException, ExecutionException {
             return null;
         }
 
         @Override
-        public Void get(long timeout, TimeUnit unit) {
+        public Void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             return null;
         }
     }

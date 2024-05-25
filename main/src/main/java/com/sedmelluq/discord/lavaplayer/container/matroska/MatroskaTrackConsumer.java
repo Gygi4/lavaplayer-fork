@@ -45,5 +45,5 @@ public interface MatroskaTrackConsumer extends AutoCloseable {
    * Already flushed, no more input coming. Free all resources.
    */
   @Override
-  void close();
+  void close() throws Exception;
 }

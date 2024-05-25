@@ -293,11 +293,11 @@ public class JsonBrowser {
     return create(mapper.readTree(stream));
   }
 
-  public static JsonBrowser newMap() {
+  public static JsonBrowser newMap() throws IOException {
     return create(mapper.createObjectNode());
   }
 
-  public static JsonBrowser newList() {
+  public static JsonBrowser newList() throws IOException {
     return create(mapper.createArrayNode());
   }
 

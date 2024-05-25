@@ -23,7 +23,7 @@ public abstract class CompositeAudioFilter implements UniversalPcmAudioFilter {
   }
 
   @Override
-  public void flush() {
+  public void flush() throws InterruptedException {
     for (AudioFilter filter : getFilters()) {
       try {
         filter.flush();

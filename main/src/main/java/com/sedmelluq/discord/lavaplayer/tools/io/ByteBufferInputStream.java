@@ -1,5 +1,6 @@
 package com.sedmelluq.discord.lavaplayer.tools.io;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
@@ -17,7 +18,7 @@ public class ByteBufferInputStream extends InputStream {
   }
 
   @Override
-  public int read() {
+  public int read() throws IOException {
     if (buffer.hasRemaining()) {
       return buffer.get() & 0xFF;
     } else {
@@ -26,7 +27,7 @@ public class ByteBufferInputStream extends InputStream {
   }
 
   @Override
-  public int read(byte[] array, int offset, int length) {
+  public int read(byte[] array, int offset, int length) throws IOException {
     if (buffer.hasRemaining()) {
       int chunk = Math.min(buffer.remaining(), length);
       buffer.get(array, offset, length);
@@ -37,7 +38,7 @@ public class ByteBufferInputStream extends InputStream {
   }
 
   @Override
-  public int available() {
+  public int available() throws IOException {
     return buffer.remaining();
   }
 }

@@ -128,12 +128,12 @@ public class NicoAudioSourceManager implements AudioSourceManager, HttpConfigura
   }
 
   @Override
-  public void encodeTrack(AudioTrack track, DataOutput output) {
+  public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
     // No extra information to save
   }
 
   @Override
-  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
+  public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
     return new NicoAudioTrack(trackInfo, this);
   }
 

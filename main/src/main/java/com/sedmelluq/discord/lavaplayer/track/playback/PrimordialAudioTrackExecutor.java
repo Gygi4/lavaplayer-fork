@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Executor implementation which is used before a track has actually been executed. Saves the position and loop
@@ -97,8 +98,7 @@ public class PrimordialAudioTrackExecutor implements AudioTrackExecutor {
   }
 
   @Override
-  public boolean provide(MutableAudioFrame targetFrame, long timeout, TimeUnit unit) {
-
+  public boolean provide(MutableAudioFrame targetFrame, long timeout, TimeUnit unit) throws TimeoutException, InterruptedException {
     return false;
   }
 

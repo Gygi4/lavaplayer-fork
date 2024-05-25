@@ -41,7 +41,7 @@ public class DefaultYandexMusicDirectUrlLoader extends AbstractYandexMusicApiLoa
     });
   }
 
-  private DownloadInfo extractDownloadInfo(String storageUrl) {
+  private DownloadInfo extractDownloadInfo(String storageUrl) throws IOException {
     try (HttpInterface httpInterface = httpInterfaceManager.getInterface()) {
       String responseText;
       try (CloseableHttpResponse response = httpInterface.execute(new HttpGet(storageUrl))) {

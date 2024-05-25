@@ -77,7 +77,7 @@ public class ResettableBoundedInputStream extends InputStream {
   }
 
   @Override
-  public void close() {
+  public void close() throws IOException {
     // Nothing to do
   }
 

@@ -1,5 +1,6 @@
 package com.sedmelluq.discord.lavaplayer.tools.io;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
@@ -17,12 +18,12 @@ public class ByteBufferOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(int b) {
+  public void write(int b) throws IOException {
     buffer.put((byte) b);
   }
 
   @Override
-  public void write(byte[] b, int off, int len) {
+  public void write(byte[] b, int off, int len) throws IOException {
     buffer.put(b, off, len);
   }
 }

@@ -74,7 +74,7 @@ public class OpusPacketRouter {
   /**
    * Indicates that no more input is coming. Flush any buffers to output.
    */
-  public void flush() {
+  public void flush() throws InterruptedException {
     if (downstream != null) {
       downstream.flush();
     }

@@ -101,6 +101,6 @@ public class ChainedInputStream extends InputStream {
     /**
      * @return Next input stream, null to cause EOF on the chained stream.
      */
-    InputStream next();
+    InputStream next() throws IOException;
   }
 }

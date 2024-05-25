@@ -69,7 +69,7 @@ public class LocalSeekableInputStream extends SeekableInputStream {
   }
 
   @Override
-  public void close() {
+  public void close() throws IOException {
     try {
       channel.close();
     } catch (IOException e) {

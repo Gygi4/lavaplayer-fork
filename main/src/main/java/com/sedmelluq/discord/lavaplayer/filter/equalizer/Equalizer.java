@@ -83,7 +83,7 @@ public class Equalizer extends EqualizerConfiguration implements FloatPcmAudioFi
   }
 
   @Override
-  public void flush() {
+  public void flush() throws InterruptedException {
     // Nothing to do here.
   }
 

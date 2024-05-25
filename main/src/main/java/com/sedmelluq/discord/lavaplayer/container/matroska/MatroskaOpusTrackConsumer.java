@@ -38,7 +38,7 @@ public class MatroskaOpusTrackConsumer implements MatroskaTrackConsumer {
   }
 
   @Override
-  public void flush() {
+  public void flush() throws InterruptedException {
     opusPacketRouter.flush();
   }
 
