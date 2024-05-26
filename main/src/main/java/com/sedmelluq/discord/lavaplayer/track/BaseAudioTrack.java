@@ -57,10 +57,10 @@ public abstract class BaseAudioTrack implements InternalAudioTrack {
   public void stop() {
     AudioTrackExecutor executor = activeExecutor.getAndSet(null);
 
-    if (executor == null) return;
-
-    initialExecutor.setPosition(executor.getPosition());
-    executor.stop();
+    if (executor != null) {
+      initialExecutor.setPosition(executor.getPosition());
+      executor.stop();
+    }
   }
 
   @Override
