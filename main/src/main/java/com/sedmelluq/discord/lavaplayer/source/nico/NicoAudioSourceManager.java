@@ -132,6 +132,10 @@ public class NicoAudioSourceManager implements AudioSourceManager, HttpConfigura
     // No extra information to save
   }
 
+  public HttpInterfaceManager getHttpInterfaceManager() {
+    return httpInterfaceManager;
+  }
+
   @Override
   public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
     return new NicoAudioTrack(trackInfo, this);
