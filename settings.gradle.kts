@@ -39,6 +39,8 @@ fun VersionCatalogBuilder.common() {
     library("jackson-core", "com.fasterxml.jackson.core", "jackson-core").versionRef("jackson")
     library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
 
+    library("nanojson", "com.grack", "nanojson").version("1.9")
+
     library("httpclient", "org.apache.httpcomponents", "httpclient").version("4.5.14")
 
     library("jsoup", "org.jsoup", "jsoup").version("1.17.2")

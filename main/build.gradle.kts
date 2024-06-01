@@ -25,6 +25,8 @@ dependencies {
     api(libs.jackson.core)
     api(libs.jackson.databind)
 
+    implementation(libs.nanojson)
+
     implementation(libs.jsoup)
     implementation(libs.base64)
     implementation(libs.json)

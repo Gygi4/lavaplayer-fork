@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.tools.io.SavedHeadSeekableInputStream;
 import com.sedmelluq.discord.lavaplayer.tools.io.SeekableInputStream;
 import com.sedmelluq.discord.lavaplayer.track.AudioReference;
 import java.io.IOException;
+import java.util.List;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
@@ -70,12 +71,23 @@ public class MediaContainerDetection {
   private MediaContainerDetectionResult detectContainer(SeekableInputStream innerStream, boolean matchHints)
       throws IOException {
 
-    for (MediaContainerProbe probe : containerRegistry.getAll()) {
+    List<MediaContainerProbe> probes = containerRegistry.getAll();
+
+    for (MediaContainerProbe probe : probes) {
       if (matchHints == probe.matchesHints(hints)) {
         innerStream.seek(0);
         MediaContainerDetectionResult result = checkContainer(probe, reference, innerStream);
 
         if (result != null) {
+          if (!result.isSupportedFile()) {
+            if ("No supported audio format in the MP4 file.".equals(result.getUnsupportedReason())) {
+              if (probes.stream().anyMatch(it -> "ffmpeg".equals(it.getName()))) {
+                // ffmpeg might be able to handle it.
+                continue;
+              }
+            }
+          }
+
           return result;
         }
       }
