@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.remote.RemoteNodeRegistry;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.io.MessageInput;
 import com.sedmelluq.discord.lavaplayer.tools.io.MessageOutput;
+import com.sedmelluq.discord.lavaplayer.track.AudioItem;
 import com.sedmelluq.discord.lavaplayer.track.AudioReference;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.DecodedTrackHolder;
@@ -14,6 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Audio player manager which is used for creating audio players and loading tracks and playlists.
@@ -98,6 +100,52 @@ public interface AudioPlayerManager {
   default Future<Void> loadItemOrdered(Object orderingKey, final String identifier, final AudioLoadResultHandler resultHandler) {
     return loadItemOrdered(orderingKey, new AudioReference(identifier, null), resultHandler);
   }
+
+  /**
+   * Loads a track or playlist with the specified identifier.
+   *
+   * @param identifier    The identifier that a specific source manager should be able to find the track with.
+   * @param resultHandler A handler to process the result of this operation. It can either end by finding a track,
+   *                      finding a playlist, finding nothing or terminating with an exception.
+   * @see #loadItemSync(AudioReference, AudioLoadResultHandler)
+   */
+  default void loadItemSync(final String identifier, final AudioLoadResultHandler resultHandler) {
+    loadItemSync(new AudioReference(identifier, null), resultHandler);
+  }
+
+  /**
+   * Loads a track or playlist with the specified identifier.
+   *
+   * @param reference     The audio reference that holds the identifier that a specific source manager
+   *                      should be able to find the track with.
+   * @param resultHandler A handler to process the result of this operation. It can either end by finding a track,
+   *                      finding a playlist, finding nothing or terminating with an exception.
+   * @see #loadItemSync(String, AudioLoadResultHandler)
+   */
+  void loadItemSync(final AudioReference reference, final AudioLoadResultHandler resultHandler);
+
+  /**
+   * Loads a track or playlist with the specified identifier and returns it.
+   *
+   * @param reference The audio reference that holds the identifier that a specific source manager
+   *                  should be able to find the track with.
+   * @return The loaded {@link AudioItem}, or `null` if nothing was found.
+   * @see #loadItemSync(AudioReference)
+   */
+  @Nullable
+  default AudioItem loadItemSync(final String reference) {
+    return loadItemSync(new AudioReference(reference, null));
+  }
+
+  /**
+   * Loads a track or playlist with the specified identifier and returns it.
+   *
+   * @param reference The audio reference that holds the identifier that a specific source manager
+   *                  should be able to find the track with.
+   * @return The loaded {@link AudioItem}, or `null` if nothing was found.
+   */
+  @Nullable
+  AudioItem loadItemSync(final AudioReference reference);
 
   /**
    * Schedules loading a track or playlist with the specified identifier with an ordering key so that items with the
