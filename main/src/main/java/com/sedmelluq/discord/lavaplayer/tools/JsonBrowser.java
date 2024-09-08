@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -94,6 +95,20 @@ public class JsonBrowser {
       throw new IllegalStateException("Remove only works on a map");
     }
   }
+
+    /**
+     * Returns a list of all key names in this element if it's a map.
+     * @return The list of keys.
+     */
+    public List<String> keys() {
+        if (!isMap()) {
+            return Collections.emptyList();
+        }
+
+        List<String> keys = new ArrayList<>();
+        node.fieldNames().forEachRemaining(keys::add);
+        return keys;
+    }
 
   /**
    * Add a value to the list if this instance contains a list.
