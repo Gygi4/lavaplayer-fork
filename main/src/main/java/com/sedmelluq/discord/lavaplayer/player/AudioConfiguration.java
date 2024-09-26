@@ -93,7 +93,8 @@ public class AudioConfiguration {
       .setOpusEncodingQuality(opusEncodingQuality)
       .setOutputFormat(outputFormat)
       .setFilterHotSwapEnabled(filterHotSwapEnabled)
-      .setFrameBufferFactory(frameBufferFactory);
+      .setFrameBufferFactory(frameBufferFactory)
+      .setOpusEncoderConfiguration(opusEncoderConfiguration);
   }
 
   /**
