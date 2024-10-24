@@ -113,7 +113,7 @@ public final class RotatingIpRoutePlanner extends AbstractRoutePlanner {
     }
 
     if (currentAddress != null) {
-      log.info("Selected {} as new outgoing ip", currentAddress);
+      log.debug("Selected {} as new outgoing ip", currentAddress);
     }
 
     next.set(false);
