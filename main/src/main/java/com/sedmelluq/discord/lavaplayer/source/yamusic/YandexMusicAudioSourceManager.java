@@ -128,6 +128,8 @@ public class YandexMusicAudioSourceManager implements AudioSourceManager, HttpCo
       return playlistLoader.loadPlaylist(matcher.group(1), matcher.group(2), "tracks", this::getTrack);
     }
     if ((matcher = playlistUuidPattern.matcher(reference.identifier)).matches()) {
+      System.out.println("UUID matched: " + matcher.group(1));
+
       return playlistLoader.loadPlaylistUuid(matcher.group(1), "tracks", this::getTrack);
     }
     if ((matcher = albumUrlPattern.matcher(reference.identifier)).matches()) {
