@@ -35,6 +35,7 @@ public class YandexMusicAudioSourceManager implements AudioSourceManager, HttpCo
   private static final String ALBUM_ID_REGEX = "album/([0-9]+)(?:\\?.*|)";
   private static final String ARTIST_ID_REGEX = "artist/([0-9]+)(?:/tracks)?(?:\\?.*|)";
   private static final String PLAYLIST_ID_REGEX = "playlists/([0-9]+)(?:\\?.*|)";
+  private static final String PLAYLIST_UUID_REGEX = "playlists/([0-9A-Za-z\\-.]+)";
   private static final String USER_REGEX = "users/(.+)";
 
   private static final Pattern trackUrlPattern = Pattern.compile("^" +
@@ -56,6 +57,11 @@ public class YandexMusicAudioSourceManager implements AudioSourceManager, HttpCo
   private static final Pattern playlistUrlPattern = Pattern.compile("^" +
           PROTOCOL_REGEX + DOMAIN_REGEX + "/" +
           USER_REGEX + "/" + PLAYLIST_ID_REGEX + "$"
+  );
+
+  private static final Pattern playlistUuidPattern = Pattern.compile("^" +
+    PROTOCOL_REGEX + DOMAIN_REGEX + "/" +
+    PLAYLIST_UUID_REGEX + "$"
   );
 
   private final boolean allowSearch;
@@ -120,6 +126,9 @@ public class YandexMusicAudioSourceManager implements AudioSourceManager, HttpCo
     }
     if ((matcher = playlistUrlPattern.matcher(reference.identifier)).matches()) {
       return playlistLoader.loadPlaylist(matcher.group(1), matcher.group(2), "tracks", this::getTrack);
+    }
+    if ((matcher = playlistUuidPattern.matcher(reference.identifier)).matches()) {
+      return playlistLoader.loadPlaylistUuid(matcher.group(1), "tracks", this::getTrack);
     }
     if ((matcher = albumUrlPattern.matcher(reference.identifier)).matches()) {
       return playlistLoader.loadPlaylist(matcher.group(1), "volumes", this::getTrack);
