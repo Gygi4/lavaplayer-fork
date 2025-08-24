@@ -16,7 +16,7 @@ public class DefaultYandexMusicPlaylistLoader extends DefaultYandexMusicTrackLoa
   private static final String PLAYLIST_INFO_FORMAT = "https://api.music.yandex.net/users/%s/playlists/%s";
   private static final String ALBUM_INFO_FORMAT = "https://api.music.yandex.net/albums/%s/with-tracks";
   private static final String ARTIST_INFO_FORMAT = "https://api.music.yandex.net/artists/%s/brief-info";
-  private static final String PLAYLIST_UUID_INFO_FORMAT = "https://api.music.yandex.net/playlists/%s?page-size=100&rich-tracks=true";
+  private static final String PLAYLIST_UUID_INFO_FORMAT = "https://api.music.yandex.net/playlist/%s?page-size=100&rich-tracks=true";
 
   private final ExecutorService tracksLoader;
 
@@ -30,8 +30,8 @@ public class DefaultYandexMusicPlaylistLoader extends DefaultYandexMusicTrackLoa
   }
 
   @Override
-  public AudioItem loadPlaylistUuid(String uuid, String domainEnd, Function<AudioTrackInfo, AudioTrack> trackFactory) {
-    return loadPlaylistUrl(String.format(PLAYLIST_UUID_INFO_FORMAT, uuid), "tracks", trackFactory);
+  public AudioItem loadPlaylistUuid(String uuid, String trackProperty, Function<AudioTrackInfo, AudioTrack> trackFactory) {
+    return loadPlaylistUrl(String.format(PLAYLIST_UUID_INFO_FORMAT, uuid), trackProperty, trackFactory);
   }
 
   @Override
