@@ -31,8 +31,6 @@ public class DefaultYandexMusicPlaylistLoader extends DefaultYandexMusicTrackLoa
 
   @Override
   public AudioItem loadPlaylistUuid(String uuid, String trackProperty, Function<AudioTrackInfo, AudioTrack> trackFactory) {
-    System.out.println(loadPlaylistUrl(String.format(PLAYLIST_UUID_INFO_FORMAT, uuid), trackProperty, trackFactory));
-
     return loadPlaylistUrl(String.format(PLAYLIST_UUID_INFO_FORMAT, uuid), trackProperty, trackFactory);
   }
 

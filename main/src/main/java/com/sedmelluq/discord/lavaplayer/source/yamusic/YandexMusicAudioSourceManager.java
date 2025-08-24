@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 /**
  * Audio source manager that implements finding Yandex Music tracks based on URL.
+ * "playlists/([0-9]+)(?:\\?.*|)"
  */
 public class YandexMusicAudioSourceManager implements AudioSourceManager, HttpConfigurable {
   private static final String PROTOCOL_REGEX = "https?://";
@@ -35,7 +36,7 @@ public class YandexMusicAudioSourceManager implements AudioSourceManager, HttpCo
   private static final String ALBUM_ID_REGEX = "album/([0-9]+)(?:\\?.*|)";
   private static final String ARTIST_ID_REGEX = "artist/([0-9]+)(?:/tracks)?(?:\\?.*|)";
   private static final String PLAYLIST_ID_REGEX = "playlists/([0-9]+)(?:\\?.*|)";
-  private static final String PLAYLIST_UUID_REGEX = "playlists/([0-9A-Za-z\\-.]+)";
+  private static final String PLAYLIST_UUID_REGEX = "playlists/([0-9A-Za-z\\-.]+)(?:\\?.*)?";
   private static final String USER_REGEX = "users/(.+)";
 
   private static final Pattern trackUrlPattern = Pattern.compile("^" +
@@ -128,8 +129,6 @@ public class YandexMusicAudioSourceManager implements AudioSourceManager, HttpCo
       return playlistLoader.loadPlaylist(matcher.group(1), matcher.group(2), "tracks", this::getTrack);
     }
     if ((matcher = playlistUuidPattern.matcher(reference.identifier)).matches()) {
-      System.out.println("UUID matched: " + matcher.group(1));
-
       return playlistLoader.loadPlaylistUuid(matcher.group(1), "tracks", this::getTrack);
     }
     if ((matcher = albumUrlPattern.matcher(reference.identifier)).matches()) {
