@@ -61,8 +61,8 @@ public class YandexMusicAudioSourceManager implements AudioSourceManager, HttpCo
   );
 
   private static final Pattern playlistUuidPattern = Pattern.compile("^" +
-    PROTOCOL_REGEX + DOMAIN_REGEX + "/" +
-    PLAYLIST_UUID_REGEX + "$"
+          PROTOCOL_REGEX + DOMAIN_REGEX + "/" +
+          PLAYLIST_UUID_REGEX + "$"
   );
 
   private final boolean allowSearch;
