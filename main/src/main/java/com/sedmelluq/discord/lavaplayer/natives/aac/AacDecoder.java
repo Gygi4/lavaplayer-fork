@@ -1,9 +1,11 @@
 package com.sedmelluq.discord.lavaplayer.natives.aac;
 
+import com.sedmelluq.discord.lavaplayer.tools.io.BitStreamReader;
 import com.sedmelluq.discord.lavaplayer.tools.io.BitStreamWriter;
 import com.sedmelluq.discord.lavaplayer.tools.io.ByteBufferOutputStream;
 import com.sedmelluq.lava.common.natives.NativeResourceHolder;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -52,9 +54,11 @@ public class AacDecoder extends NativeResourceHolder {
     int extensionFrequency = isSbrOrPs(objectType) ? frequency * 2 : frequency;
     int extensionProfile = isSbrOrPs(objectType) ? AAC_LC : objectType;
 
-    byte[] buffer = encodeConfiguration(objectType, frequency, channels, extensionFrequency, extensionProfile);
-
-    configure(buffer);
+    long buffer = encodeConfiguration(objectType, frequency, channels, extensionFrequency, extensionProfile);
+    int error = configureRaw(buffer);
+    if (error != 0) {
+      throw new IllegalStateException("Configuring decoder failed with error " + error);
+    }
   }
 
   /**
@@ -64,24 +68,54 @@ public class AacDecoder extends NativeResourceHolder {
    * @throws IllegalStateException If the decoder has already been closed.
    */
   public void configure(byte[] config) {
-    checkNotReleased();
-
     if (config.length > 8) {
       throw new IllegalArgumentException("Cannot process a header larger than size 8");
     }
 
-    library.configure(instance, config);
+    long buffer = 0;
+    for (int i = 0; i < config.length; i++) {
+      buffer |= ((long) (config[i] & 0xff)) << (i << 3);
+    }
+
+    int error = configureRaw(buffer);
+    if (error != 0) {
+      try (ByteArrayInputStream stream = new ByteArrayInputStream(config)) {
+        BitStreamReader reader = new BitStreamReader(stream);
+        int objectType = reader.asInteger(5);
+        int sampleRateIndex = reader.asInteger(4);
+        int sampleRate = sampleRateIndex == 15
+            ? reader.asInteger(24)
+            : SAMPLERATE_TABLE[sampleRateIndex];
+        int channels = reader.asInteger(4);
+        configure(objectType, sampleRate, channels);
+        return;
+      } catch (IOException ignored) {
+        // ByteArrayInputStream does not throw in practice. Preserve the native error below if it does.
+      }
+
+      throw new IllegalStateException("Configuring decoder failed with error " + error);
+    }
+  }
+
+  private synchronized int configureRaw(long buffer) {
+    checkNotReleased();
+
+    if (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN) {
+      buffer = Long.reverseBytes(buffer);
+    }
+
+    return library.configure(instance, buffer);
   }
 
   private static boolean isSbrOrPs(int objectType) {
     return objectType == SBR || objectType == PS;
   }
 
-  private static byte[] encodeConfiguration(int objectType,
-                                            int frequency,
-                                            int channels,
-                                            int extensionFrequency,
-                                            int extensionProfile) {
+  private static long encodeConfiguration(int objectType,
+                                          int frequency,
+                                          int channels,
+                                          int extensionFrequency,
+                                          int extensionProfile) {
     try {
       ByteBuffer buffer = ByteBuffer.allocate(8);
       buffer.order(ByteOrder.nativeOrder());
@@ -113,7 +147,7 @@ public class AacDecoder extends NativeResourceHolder {
 
       buffer.clear();
 
-      return buffer.array();
+      return buffer.getLong();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

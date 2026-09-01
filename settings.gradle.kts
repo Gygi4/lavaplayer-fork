@@ -50,7 +50,7 @@ fun VersionCatalogBuilder.common() {
 }
 
 fun VersionCatalogBuilder.others() {
-    library("lavaplayer-natives-fork", "com.github.Gygi4", "lavaplayer-natives-fork").version("1.0.6")
+    library("lavaplayer-natives-fork", "dev.arbjerg", "lavaplayer-natives").version("2.2.7")
     library("ibxm-fork", "com.github.walkyst", "ibxm-fork").version("a75")
     library("rhino-engine", "org.mozilla", "rhino-engine").version("1.7.15")
 }
